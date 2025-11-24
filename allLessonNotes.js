@@ -31,4 +31,5 @@
  */
 //* but now if we go to browser and go to this path:- http://localhost:5173/login still we will not see the login page on the ui because inside the body component we have given any place to render the child components , so to make it work we have to go inside the body component and add a  Outlet component, below the navbar so other child components render inside it, and as navbar will be present inside the Body always , so inside other components we don't need to write navbar component.
 
-//* And we have also created a footer to added that below the Outlet component so every page will have a footer
+//* And we have also created a footer to added that below the Outlet component so every page will have a footer.
+//* write comments about log in page, (useState for email and password)
