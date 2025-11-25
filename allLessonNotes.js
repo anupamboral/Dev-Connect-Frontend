@@ -33,3 +33,104 @@
 
 //* And we have also created a footer to added that below the Outlet component so every page will have a footer.
 //* write comments about log in page, (useState for email and password)
+
+//* in the log in page , to keep track of what the user is typing we will create a useState variable for both email and password like below,
+//*  const [emailId, setEmailId] = useState("");
+//*  const [password, setPassword] = useState("");
+
+//*  then use this variable inside the input fields like below:-
+<input
+  type="text"
+  className="input"
+  placeholder="email@.com"
+  value={emailId}
+  onChange={(e) => {
+    setEmailId(e.target.value);
+  }}
+/>;
+<input
+  type="text"
+  className="input"
+  placeholder="TypeStrongPass@234"
+  value={password}
+  onChange={(e) => {
+    setPassword(e.target.value);
+  }}
+/>;
+//* this will keep track of what the user is typing;
+
+//* now to make a api call to our server we will use a library named axios, previously we used  fetch api to make api calls , but this time we will use another library name axios for making api call, actual the axios syntax for making api call is smaller that fetch api call , first in the button of sign in , we will write a onclick handler and mention a handle login function, like below:-
+/*
+ <button className="btn btn-primary flex " onClick={handleLogin}>
+              Log In
+            </button>
+            */
+//* in the above portion now we will create this jandle login function:-
+//* so if we would create it using fetch api it would look like:-
+const handleLogin = async () => {
+  try {
+    const requestOptions = {
+      method: "POST",
+      credentials: "include", //* for setting up/storing cookies(token) in browser
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        emailId: emailId,
+        password: password,
+      }),
+    };
+    const res = await fetch("http://localhost:3000/signin", requestOptions);
+    const data = await res.json();
+    console.log(data);
+  } catch (err) {
+    console.error(err.message);
+  }
+};
+
+//* but if we create this handleLogIn function using axios then it will look like(but it will not set cookies in the browser):-
+import axios from "axios";
+
+const handleLogin2 = async () => {
+  try {
+    const data = await axios.post("http://localhost:3000/signin", {
+      emailId,
+      password,
+    });
+    console.log(data.data);
+  } catch (err) {
+    console.error(err.message);
+  }
+};
+//* see how the syntax is smaller than fetch api, axios library automatically sets header , automatically converts the data to json format while sending to server , and when the server returns data in json format , it automatically converts in to string format from json. so it is more easier.
+
+//! WhiteListing our url and setting up credentials to store the cookies in the browser
+//* now we will see that we save successful received the data from the server and also see that in the headers we also got the token , but but this token is not saved into our  browser, so we have to go to "applications" tab in the browser developer console and then cookies => http://localhost:5173/ , and see no cookies is saved , it is happening because of the cookies are coming from a unauthorized url and it is not https , so in the backend first we have to whitelist our frontend url and and also set credentials to true because this Accept credentials (cookies) sent by the client, so when we will send the the token to verify server will allow it, so lets go to our cors middleware and mention these options: like below:-
+/*
+*app.use(
+*  cors({
+*    origin: "http://localhost:5173/", //*(Whatever your frontend url is)
+*    credentials: true, // *<= Accept credentials (cookies) sent by the client
+*  })
+);*/
+
+//* but if we try again still it will not set the cookies in the browser, so one more setting in the frontend code it still left,so we will go to our login page code in the frontend where we are making the api call using axios and there after the url have to pass an object set withCredentials to true inside it and it will then send the cookies when it will make an api call and also store cookies in  the browser, now it will save the cookies to the browser.So it will look like:-
+/*
+* const handleLogin = async () => {
+*    try {
+*      const data = await axios.post(
+*        "http://localhost:3000/signin",
+*        {
+*          emailId,
+*          password,
+*        },
+!       { withCredentials: true }
+*      );
+*      //* setting this withCredentials to true is important to save the cookies *into browser.either it will send cookies but not save in the browser.
+*      console.log(data.data);
+*    } catch (err) {
+*      console.error(err.message);
+*    }
+*  };
+  */
+//* if we would use fetch api then we had use, credentials: "include",inside the options , below method:"POST",as property.

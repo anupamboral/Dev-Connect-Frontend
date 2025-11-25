@@ -1,9 +1,26 @@
+import axios from "axios";
 import { useState } from "react";
 
 const Login = () => {
   //* state variables to keep track what user is typing(binding state with ui components)
-  const [emailId, setEmailId] = useState("");
-  const [password, setPassword] = useState("");
+  const [emailId, setEmailId] = useState("om@swami.com");
+  const [password, setPassword] = useState("OmSwami@336");
+  const handleLogin = async () => {
+    try {
+      const data = await axios.post(
+        "http://localhost:3000/signin",
+        {
+          emailId,
+          password,
+        },
+        { withCredentials: true }
+      );
+      //* setting this withCredentials to true is important to save the cookies into browser.either it will send cookies but not save in the browser.
+      console.log(data.data);
+    } catch (err) {
+      console.error(err.message);
+    }
+  };
   return (
     <div className="flex justify-center mt-4">
       <div className="card bg-base-300 w-96 shadow-sm flex justify-center">
@@ -34,7 +51,9 @@ const Login = () => {
             />
           </fieldset>
           <div className="card-actions my-4  justify-center">
-            <button className="btn btn-primary flex ">Log In</button>
+            <button className="btn btn-primary flex " onClick={handleLogin}>
+              Log In
+            </button>
           </div>
         </div>
       </div>
