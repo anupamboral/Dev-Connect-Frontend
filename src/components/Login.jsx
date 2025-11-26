@@ -1,14 +1,21 @@
 import axios from "axios";
 import { useState } from "react";
+import { useDispatch } from "react-redux";
+import { addUser } from "../utils/userSlice";
+import { useNavigate } from "react-router-dom";
+import { BASE_URL } from "../utils/constants";
 
 const Login = () => {
+  //* importing dispatch function
+  const dispatch = useDispatch();
   //* state variables to keep track what user is typing(binding state with ui components)
   const [emailId, setEmailId] = useState("om@swami.com");
   const [password, setPassword] = useState("OmSwami@336");
+  const navigate = useNavigate();
   const handleLogin = async () => {
     try {
       const data = await axios.post(
-        "http://localhost:3000/signin",
+        BASE_URL + "/signin",
         {
           emailId,
           password,
@@ -17,6 +24,10 @@ const Login = () => {
       );
       //* setting this withCredentials to true is important to save the cookies into browser.either it will send cookies but not save in the browser.
       console.log(data.data);
+      //* dispatching action to add the returned user data to the userSlice in the redux store
+      dispatch(addUser(data.data));
+      //* navigating to feed(/) page
+      navigate("/");
     } catch (err) {
       console.error(err.message);
     }
