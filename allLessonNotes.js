@@ -315,3 +315,68 @@ console.log(handleLogin);
 
 //* now we will do some refactoring, so when we are making api call to the server in the login page, then we should not write url directly , so we make a , constants file inside the utils folder and the we will write the , the BASE_URL as a constant and export it then import it in the login page and use that like :-         BASE_URL + "/signin",
 //* and also we should not keep other components inside the src like this, so inside the src folder we will make a components folder inside src folder and and move other components inside the components folder except the app.jsx,main.jsx,index.css.So we will also update the imports , of these moved files.
+
+//! keep logged in feature while refreshing the browser
+//* So whenever we go to a website and log in then we come after some time Will still see that Our profile is logged in So it has not automatically logged out And that happens because The browser saves the token sent by The server and then using that token The browser again fetches the User data  and shows in the ui that we are logged in .
+//*But In case of our website even Token is stored in the browser but still when we're reloading the browser Our Profile gets logged out so how can we implement the feature that when we reload the browser or come to our website after some time then still our profile Remains logged in So to implement this Feature As we know that Our token is present inside the browser  And When the user Will load Any page of our website I like the profile page or the feed page all of these pages will be loaded inside the body so basically to load every page Our body will be loaded So we have to go inside Our body component Where every other component loads inside the outlet component And inside this body component We will fetch the user Using the profile view api we built in the back end So we will create a function named fetchUser And inside it we'll call our /profile/view api And fetch the user From the server
+//*So when we will make the api call Using the axios library As the first argument we will mention the url of the back end And then as the second argument we will pass a object and inside that object we will mention withCredentials property And its value will be true .So because of this withCredentials:true, if token present inside the browser will be sent to the server And we already know that our /profile/view api will  will only work when we send the token to the server so it verifies the User using the token frontend sends, So basically our front end will send the token present inside the browser and this token will be verified by the back end and only when the token is valid then only it will send the user data And as soon as we get the data in our Front As the response we will save that response inside Our Redux store using The add user action We built So when the Redux store will be updated We'll see that Logged in.
+//* So this is how we can implement this feature But we have to call this function inside the body ,Because When the user reloads Our website it will be treated as a first time load of the website or even the user comes after some days and loads the website that will be again treated as the first time load for our website so basically When our body component gets mounted  to the page For the first time then we have to call This function and to do it we can use the Use effect hook With the empty array argument passed as the Second argument So as As we know that In the use effect hook , As the first argument we have to pass a callback function Inside this function We can mention the Fetch user Function call And then as the second argument if we pass an empty array that means whenever This body component will Mounted for the first time This use effect hook will be called And it will fetch the user And the user will see that his profile is still logged in Even he reloads the page or if even he comes after Some days before our token expires For the cookie expires So that is how We can implement the feature Using our profile view api, Our token present inside the browser And the use effect hook with an empty array, And The token is not valid or not present we know that The server will send A 401 status code Please login Message As we updated token failed error message , so it will send 401 status code which means unauthorized credentials With the error message please login,
+//* So in the catch block When The server has responded With the 401 status code then we will use the use navigate hook and send the user To the login page And because of this Whenever some user Try to access any of our Website page Even it is the profile page or even it is the feed page All of these pages get loaded inside the Outlet component and the outlet component is present inside the body component so every time The body is mounted for the first Which happens when the user reloads the browser or loads the browser after some days Every time This huge effect will be called And it will try to validate the token and if the token is present then it will fetch the user and it will show the user that he is still logged in but when the user is not logged in And he tries load Our profile page or our feed page which should be only Loaded when the user is logged in So because of this token validation always the server will return the status code and  Because of this navigate book We will mention , he will always redirected to the log in page.
+//* so in the body.jsx we have write below code
+/*
+ * const navigate = useNavigate();
+ * const dispatch = useDispatch();
+ * const fetchUser = async () => {
+ *   try {
+ *     //* fetching user data when user is logged in and token is valid that's why * we are setting withCredentials to true to send the token to server
+ *     const res = await axios.get(BASE_URL + "/profile/view", {
+ *       withCredentials: true,
+ *     });
+ *     //* saving data in to userSlice(redux stare)
+ *     dispatch(addUser(res.data));
+ *   } catch (err) {
+ *     if (err.status === 401) {
+ *       //* if token is not valid then then sending the user to login page
+ *       navigate("/login");
+ *     }
+ *     //* if any other error happens(also sending error data because in * declarative mode of react router we can't use useRouterError hook )
+ *     navigate("/error", {
+ *       state: { errorMessage: err.message, errorState: err.state },
+ *     });
+ *     console.error(err.message);
+ *   }
+ * };
+ *
+ * //* calling useEffect hook with empty array , whenever this component will load * first time it will call this useEffect and the fetchUser function will be called * and if the token is present then the userData will be fetched and added to the * redux store , so even the user refresh the page , his profile will be still * logged in until the token or cookie expires. and if the token is expired then * user will be redirected to the login page.
+ * useEffect(() => {
+ *   fetchUser();
+ * });
+ */
+
+//! Error Handling in declarative mode.
+//* So as we are using The declarative mode in react router Because of this mode we can't use the use router error hook We used in the previous projects So to access the error in the error page First of all we will Error file And in the App jsx file we will add the path "/error" with the element <Error/> , And now We can come back to the Body.jsx, So in the catch block , We navigated The user to the login page when the status code is 401 But when the status quo is something else so some other error has happened In that scenario Redirect the user To the error Using the Navigate hook so we'll first get navigate using Use navigate hook and then we will use this navigate function To navigate the user To the error page But as the useRouterError hook is not present, So we have to use another way to send this error status and error message to the Error component So when we Calling the navigate function As the first argument we are mentioning The path of the error page Now as a second argument we can also pass Some data so we have to mention Object and inside that object we Use a status property and this status property can have a value which can be an object So inside this object we can pass our error message and the error status Now to This error message and the error status We have to go to the error compo End End Inside error .J S X We have Use a hook named useLocation() hook, And from this hook we can get Axis all of the data so first we have to Save this use location hooks value into a constant named location And then from this location we can destructure The status and from that status we can destructure The error message The error status code.
+//! in body.jsx , catch block:-
+/*
+ * navigate("/error", {
+ *   state: { errorMessage: err.message, errorState: err.state },
+ * });
+ */
+//! in Error.jsx
+/*
+ * import { useLocation } from "react-router-dom";
+ *
+ *
+ * const Error = () => {
+ *   const location = useLocation();//* to access the data sent by useNavigate * hook"s navigate function as second arg
+ *   // console.log(location.state);
+ *   const { errorMessage, errorState } = location.state;
+ *   return (
+ *     <div className="error-page flex mt-40 justify-center items-center flex-col * gap-8">
+ *       <h1>Oopsss!!!</h1>
+ *       <h2>Something went wrong</h2>
+ *       <h2>{`${errorState}:- ${errorMessage}`}</h2>
+ *     </div>
+ *   );
+ * };
+ * export default Error;
+ */

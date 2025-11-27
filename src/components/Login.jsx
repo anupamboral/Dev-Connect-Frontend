@@ -8,10 +8,11 @@ import { BASE_URL } from "../utils/constants";
 const Login = () => {
   //* importing dispatch function
   const dispatch = useDispatch();
+  const navigate = useNavigate();
   //* state variables to keep track what user is typing(binding state with ui components)
   const [emailId, setEmailId] = useState("om@swami.com");
   const [password, setPassword] = useState("OmSwami@336");
-  const navigate = useNavigate();
+
   const handleLogin = async () => {
     try {
       const data = await axios.post(
@@ -29,6 +30,9 @@ const Login = () => {
       //* navigating to feed(/) page
       navigate("/");
     } catch (err) {
+      navigate("/error", {
+        state: { errorMessage: err.message, errorState: err.state },
+      });
       console.error(err.message);
     }
   };
