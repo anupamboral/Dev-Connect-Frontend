@@ -28,8 +28,8 @@ function Body() {
       navigate("/error", {
         state: {
           errorMessage:
-            err.response.data.message + `(${err.response.statusText})`,
-          errorState: `Status ` + err.response.status,
+            err?.response?.data?.message + `(${err?.response?.statusText})`,
+          errorState: `Status ` + err?.response?.status,
         },
       });
       console.error(err.message);

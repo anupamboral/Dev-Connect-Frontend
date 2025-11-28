@@ -33,7 +33,7 @@ const Login = () => {
       //* navigating to feed(/) page
       navigate("/");
     } catch (err) {
-      setError(err.response.data.message + "!!!!");
+      setError(err?.response?.data?.message + "!!!!");
       console.error(err.message);
     }
   };

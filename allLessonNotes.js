@@ -401,25 +401,28 @@ console.log(handleLogin);
 //*  <a onClick={handleLogOut}>Logout</a>
 // * inside the handleLogOut function we will call the logout api, which will expire the cookie and token, but the data is already present inside the redux store so we will dispatch an action using removeUser action to empty the redux store and then navigate the ue to the login page, as the user is logging out. like below:-
 /*
-*  const navigate = useNavigate();
-*   const dispatch = useDispatch();
-* 
-*   const handleLogOut = async () => {
-*     //* we don't need to show the successful logout message, so we have not * saved the returned response into any constant
-*     await axios.post(
-*       BASE_URL + "/logout",
-*       {},
-*       {
-*         withCredentials: true,
-*       }
-*     ); //* first arg is for the url, second arg {} is for body , and we are not  sending any data for this api call, and third arg is for options , in this wew  are setting  withCredentials:true to send the cookies and token to the server
-* 
-*     //* dispatching action to empty the user data from the redux store
-*     dispatch(removeUser());
-* 
-*     //*navigating user to login page
-*     navigate("/login");
-*   };
-  */
+ *  const navigate = useNavigate();
+ *   const dispatch = useDispatch();
+ *
+ *   const handleLogOut = async () => {
+ *     //* we don't need to show the successful logout message, so we have not * saved the returned response into any constant
+ *     await axios.post(
+ *       BASE_URL + "/logout",
+ *       {},
+ *       {
+ *         withCredentials: true,
+ *       }
+ *     ); //* first arg is for the url, second arg {} is for body , and we are not  sending any data for this api call, and third arg is for options , in this wew  are setting  withCredentials:true to send the cookies and token to the server
+ *
+ *     //* dispatching action to empty the user data from the redux store
+ *     dispatch(removeUser());
+ *
+ *     //*navigating user to login page
+ *     navigate("/login");
+ *   };
+ */
 
 //* in the log in page , if the user enter some wrong data then it will show the error in the developer console but we have noway to show the error in the ui, so let's add a p tag above the login button, where will show the error, and this button will be dynamic, so we will make state variable for error, and mention that state variable in this paragraph tag, and where we are fetching the data for login , so in the handleLogIn function 's catch block , we will use setError() function to set the error message, so initial error value will be empty, that's why the p tag will hidden , but whenever some error will happen it because of setError function the error variable's value will be set and error will display on the ui.
+
+//! feed page
+//*1h5m write all comments about feed , userCard, feedSlice
