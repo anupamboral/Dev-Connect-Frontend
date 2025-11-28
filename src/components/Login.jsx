@@ -6,6 +6,9 @@ import { useNavigate } from "react-router-dom";
 import { BASE_URL } from "../utils/constants";
 
 const Login = () => {
+  //* in the log in page , if the user enter some wrong data then it will show the error in the developer console but we have noway to show the error in the ui, so let's add a p tag above the login button, where will show the error, and this button will be dynamic, so we will make state variable for error, and mention that state variable in this paragraph tag, and where we are fetching the data for login , so in the handleLogIn function 's catch block , we will use setError() function to set the error message, so initial error value will be empty, that's why the p tag will hidden , but whenever some error will happen it because of setError function the error variable's value will be set and error will display on the ui.
+  //* state variable to keep track of the error in the login page
+  const [error, setError] = useState("");
   //* importing dispatch function
   const dispatch = useDispatch();
   const navigate = useNavigate();
@@ -30,9 +33,7 @@ const Login = () => {
       //* navigating to feed(/) page
       navigate("/");
     } catch (err) {
-      navigate("/error", {
-        state: { errorMessage: err.message, errorState: err.state },
-      });
+      setError(err.response.data.message + "!!!!");
       console.error(err.message);
     }
   };
@@ -65,6 +66,7 @@ const Login = () => {
               }}
             />
           </fieldset>
+          <p className="text-sm text-red-500">{error}</p>
           <div className="card-actions my-4  justify-center">
             <button className="btn btn-primary flex " onClick={handleLogin}>
               Log In

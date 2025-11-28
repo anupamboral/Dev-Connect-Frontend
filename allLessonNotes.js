@@ -337,7 +337,7 @@ console.log(handleLogin);
  *   } catch (err) {
  *     if (err.status === 401) {
  *       //* if token is not valid then then sending the user to login page
- *       navigate("/login");
+ *       return navigate("/login");//* writing return here is important to stop further execution.
  *     }
  *     //* if any other error happens(also sending error data because in * declarative mode of react router we can't use useRouterError hook )
  *     navigate("/error", {
@@ -350,16 +350,20 @@ console.log(handleLogin);
  * //* calling useEffect hook with empty array , whenever this component will load * first time it will call this useEffect and the fetchUser function will be called * and if the token is present then the userData will be fetched and added to the * redux store , so even the user refresh the page , his profile will be still * logged in until the token or cookie expires. and if the token is expired then * user will be redirected to the login page.
  * useEffect(() => {
  *   fetchUser();
- * });
+ * },[]);
  */
 
 //! Error Handling in declarative mode.
 //* So as we are using The declarative mode in react router Because of this mode we can't use the use router error hook We used in the previous projects So to access the error in the error page First of all we will Error file And in the App jsx file we will add the path "/error" with the element <Error/> , And now We can come back to the Body.jsx, So in the catch block , We navigated The user to the login page when the status code is 401 But when the status quo is something else so some other error has happened In that scenario Redirect the user To the error Using the Navigate hook so we'll first get navigate using Use navigate hook and then we will use this navigate function To navigate the user To the error page But as the useRouterError hook is not present, So we have to use another way to send this error status and error message to the Error component So when we Calling the navigate function As the first argument we are mentioning The path of the error page Now as a second argument we can also pass Some data so we have to mention Object and inside that object we Use a status property and this status property can have a value which can be an object So inside this object we can pass our error message and the error status Now to This error message and the error status We have to go to the error compo End End Inside error .J S X We have Use a hook named useLocation() hook, And from this hook we can get Axis all of the data so first we have to Save this use location hooks value into a constant named location And then from this location we can destructure The status and from that status we can destructure The error message The error status code.
 //! in body.jsx , catch block:-
 /*
- * navigate("/error", {
- *   state: { errorMessage: err.message, errorState: err.state },
- * });
+ *  navigate("/error", {
+ *        state: {
+ *          errorMessage:
+ *            err.response.data.message + `(${err.response.statusText})`,
+ *          errorState: `Status ` + err.response.status,
+ *        },
+ *      });
  */
 //! in Error.jsx
 /*
@@ -380,3 +384,42 @@ console.log(handleLogin);
  * };
  * export default Error;
  */
+
+//* we have also added the redirection links to the profile option and the logo , using the <link> component(instead of anchor tag we have to use Link tag) like below:-
+/*
+ * <Link to="/" className="btn btn-ghost text-xl">
+ *          Dev🤝Connect
+ * </Link>
+ * <Link to="/profile" className="justify-between">
+ *           Profile
+ *         <span className="badge">New</span>
+ * </Link>
+ */
+
+//! Log out feature
+//* we already built the logout api in the backend which basically set the token to null and expires the cookie immediately, so our logout button is present inside the the navbar component, so let's go inside the Navbar component and build a handleLogOut function , and this function will called when onClick event will happen on logout button,like below:-
+//*  <a onClick={handleLogOut}>Logout</a>
+// * inside the handleLogOut function we will call the logout api, which will expire the cookie and token, but the data is already present inside the redux store so we will dispatch an action using removeUser action to empty the redux store and then navigate the ue to the login page, as the user is logging out. like below:-
+/*
+*  const navigate = useNavigate();
+*   const dispatch = useDispatch();
+* 
+*   const handleLogOut = async () => {
+*     //* we don't need to show the successful logout message, so we have not * saved the returned response into any constant
+*     await axios.post(
+*       BASE_URL + "/logout",
+*       {},
+*       {
+*         withCredentials: true,
+*       }
+*     ); //* first arg is for the url, second arg {} is for body , and we are not  sending any data for this api call, and third arg is for options , in this wew  are setting  withCredentials:true to send the cookies and token to the server
+* 
+*     //* dispatching action to empty the user data from the redux store
+*     dispatch(removeUser());
+* 
+*     //*navigating user to login page
+*     navigate("/login");
+*   };
+  */
+
+//* in the log in page , if the user enter some wrong data then it will show the error in the developer console but we have noway to show the error in the ui, so let's add a p tag above the login button, where will show the error, and this button will be dynamic, so we will make state variable for error, and mention that state variable in this paragraph tag, and where we are fetching the data for login , so in the handleLogIn function 's catch block , we will use setError() function to set the error message, so initial error value will be empty, that's why the p tag will hidden , but whenever some error will happen it because of setError function the error variable's value will be set and error will display on the ui.

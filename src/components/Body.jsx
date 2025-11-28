@@ -1,4 +1,4 @@
-import { Navigate, Outlet, useNavigate } from "react-router-dom";
+import { Outlet, useNavigate } from "react-router-dom";
 import Navbar from "./Navbar";
 import Footer from "./Footer";
 import axios from "axios";
@@ -20,12 +20,17 @@ function Body() {
       dispatch(addUser(res.data));
     } catch (err) {
       if (err.status === 401) {
+        console.log(err);
         //* if token is not valid then then sending the user to login page
-        navigate("/login");
+        return navigate("/login"); //* here using return keyword is necessary , if we write return then only it will navigate to login page and stop further execution , but we don't write return then it continue the execution and execute below code , which will again redirect the user to error, and that should not happen in case of 401 unauthorized error, the below code should only execute when some other error happens like 404, 400 or any else but not 401 , so writing return is important to stop further execution
       }
       //* if any other error happens(also sending error data because in declarative mode of react router we can't use useRouterError hook )
       navigate("/error", {
-        state: { errorMessage: err.message, errorState: err.state },
+        state: {
+          errorMessage:
+            err.response.data.message + `(${err.response.statusText})`,
+          errorState: `Status ` + err.response.status,
+        },
       });
       console.error(err.message);
     }
@@ -34,7 +39,8 @@ function Body() {
   //* calling useEffect hook with empty array , whenever this component will load first time it will call this useEffect and the fetchUser function will be called and if the token is present then the userData will be fetched and added to the redux store , so even the user refresh the page , his profile will be still logged in until the token or cookie expires. and if the token is expired then user will be redirected to the login page.
   useEffect(() => {
     fetchUser();
-  });
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   return (
     <div>
