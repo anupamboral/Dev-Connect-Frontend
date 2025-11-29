@@ -1,15 +1,17 @@
 import axios from "axios";
-import React, { useEffect } from "react";
+import { useEffect } from "react";
 import { BASE_URL } from "../utils/constants";
 import { useDispatch, useSelector } from "react-redux";
 import { addFeed } from "../utils/feedSlice";
 import { useNavigate } from "react-router-dom";
 import UserCard from "./UserCard";
+import EditCard from "./EditProfile";
 
 const Feed = () => {
   const dispatch = useDispatch();
   const navigate = useNavigate();
   const feed = useSelector((store) => store.feed);
+
   const fetchFeedData = async () => {
     //! when we are making a get call, we don't pass anything inside body as it is a get call , so second param for body which is a { } is not required, so for get call second param will be object for options where can set the withCredentials to true, but for post call always the second param will be for request body, and third param will be for options.
     try {
@@ -34,12 +36,12 @@ const Feed = () => {
   useEffect(() => {
     fetchFeedData();
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+  }, []); //* empty dependency array to render it only on first mount
 
   return (
     feed && (
-      <div className="flex justify-center my-8">
-        {<UserCard feed={feed.data[0]} />}
+      <div className="flex justify-center ">
+        <UserCard feed={feed.data[0]} />
       </div>
     )
   );

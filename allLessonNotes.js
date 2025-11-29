@@ -425,4 +425,88 @@ console.log(handleLogin);
 //* in the log in page , if the user enter some wrong data then it will show the error in the developer console but we have noway to show the error in the ui, so let's add a p tag above the login button, where will show the error, and this button will be dynamic, so we will make state variable for error, and mention that state variable in this paragraph tag, and where we are fetching the data for login , so in the handleLogIn function 's catch block , we will use setError() function to set the error message, so initial error value will be empty, that's why the p tag will hidden , but whenever some error will happen it because of setError function the error variable's value will be set and error will display on the ui.
 
 //! feed page
-//*1h5m write all comments about feed , userCard, feedSlice
+//* to build the feed page we will go the the feed.jsx , and we will make a fetchFeed function and inside it make api call to the /user/feed api, and also send the cookies by setting withCredentials:true; and get feed data , like below:-
+/*
+ *      const res = await axios.get(BASE_URL + "/user/feed", {
+ *        withCredentials: true,
+ *      });
+ *      console.log(res);
+ */
+
+//* now to store this feed data we will create a feedSlice, and add that to the store , like below:-
+//! in userSlice.js
+/*
+* import { createSlice } from "@reduxjs/toolkit";
+
+* const userSlice = createSlice({
+*   name: "User",
+*   initialState: null,
+*   reducers: {
+*     addUser: (state, action) => {
+*       return action.payload;
+*     },
+*     removeUser: () => {
+*       return null;
+*     },
+*   },
+* });
+* 
+* export const { addUser, removeUser } = userSlice.actions;
+* 
+* export default userSlice.reducer;
+*/
+
+//! adding feedSlice to the store(appstore.js)
+/*
+! import feedSlice from "./feedSlice";
+* const appStore = configureStore({
+*   reducer: {
+*     user: userSlice,
+!     feed: feedSlice,
+*   },
+* });
+* export default appStore;
+*/
+
+//* now inside the feed.jsx, inside fetchFeedData dispatch a addFeed action to add the data to the feedSlice, and now we will call this fetchFeedData inside useEffect hook inside with a empty dependency array so , so it only gets called when this feed page first time mounts, and now we will create a UserCard components and get a card from daisy ui , and then use that inside the UserCard, and now we will composition this UserCard inside the Feed component , and then on the top side of feed component we will subscribe to the store, and get the store data inside a constant named feed, and conditionally render the this UserCard depending on the feed coming from store, because if we don't write this condition then it will try to render the user even before getting the feed data from the store and that will throw an error , so writing it conditionally using && operator is important. , and also pass the one of the user data from the feed coming from the store, and pass it inside the UserCard as a prop, and then using that we will display all the user details in the userCard. , so right now, our feed looks like below:-
+/*
+ * const Feed = () => {
+ *   const dispatch = useDispatch();
+ *   const navigate = useNavigate();
+ *   const feed = useSelector((store) => store.feed);
+ *   const fetchFeedData = async () => {
+ *     //! when we are making a get call, we don't pass anything inside body as it  is a get call , so second param for body which is a { } is not required, so for  get call second param will be object for options where can set the * withCredentials to true, but for post call always the second param will be for * request body, and third param will be for options.
+ *     try {
+ *       const res = await axios.get(BASE_URL + "/user/feed", {
+ *         withCredentials: true,
+ *       });
+ *       console.log(res);
+ *       //* adding data to the store(feedSlice)
+ *       dispatch(addFeed(res.data));
+ *     } catch (err) {
+ *       navigate("/error", {
+ *         state: {
+ *           errorMessage:
+ *             err?.response?.data?.message + `(${err?.response?.statusText})`,
+ *           errorState: `Status ` + err?.response?.status,
+ *         },
+ *       });
+ *       console.error(err.message);
+ *     }
+ *   };
+ *
+ *   useEffect(() => {
+ *     fetchFeedData();
+ *     // eslint-disable-next-line react-hooks/exhaustive-deps
+ *   }, []);//* empty dependency array to render it only on first mount
+ *
+ *   return (
+ *     feed && (
+ *       <div className="flex justify-center my-8">
+ *         {<UserCard feed={feed.data[0]} />}
+ *       </div>
+ *     )
+ *   );
+ * };
+ */
+//* show toast feature in edit profile page 3 sec and write comments for edit Profile feature.
