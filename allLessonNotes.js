@@ -510,3 +510,203 @@ console.log(handleLogin);
  * };
  */
 //* show toast feature in edit profile page 3 sec and write comments for edit Profile feature.
+
+//! Profile (Edit profile page)
+//* in the navbar we will first add the link to go to the profile page, using Link component and mention "/profile" to go to the profile page. in the page, we will we will get the logged'in user's profile data from the store by subscribing to the store, using useSelector hook, and we will create a new EditProfile component and export that , then import it to the profile.jsx and composition this EditProfile component inside the profile component, and also pass the user data as prop , and now we will build the edit profile component , so let's go inside it, inside it we will create some input fields like created for the log in page, we can also copy some data from the log in page, and add a input field every data about the user , except email because we won't allow the user to change the email, and and only for the gender option we will create a dropdown because database won't allow uppercase data for gender because of our validation so, we are creating a dropdown for it and then  all of this input field will be inside a div. and now for every data field(  firstName, lastName, about, age, skills, gender, photoUrl,) variable we will create a state variable and there initial value will be the value we received through the props(from the store), and all of the and we will use this state variable's value as the value of its corresponding input fields and also below this whole div we will create a new div and in this new div we will composition a  UserCard component and pass also this state variables inside a object as feed prop. and then for every input elm on the onChange event we will mention the set state functions corresponding to the input field, so then when ever the user will change something on the input field, as the set function will be called , so the live change will be also reflected on the userCard component, as we will put both side by side using display flex, and  the same same changing state variable is passed inside the UserCard as the prop. and remember only for the skills as it is a array, so when the user is inputting the data , we have to also convert it to a array , so for setSkill function we have write it like:-
+/*
+*      <legend className="fieldset-legend">Skills</legend>
+*                 <input
+*                   type="text"
+*                   className="input"
+*                   value={skills}
+!                  onChange={(e) => setSkills(e.target.value.split(","))}
+*                 />
+* </fieldset>
+              */
+//* and now we will create a handleUpdateProfile , and this will be called when save profile button will clicked , so on onClick event, this will be called, and inside the handleUpdateProfile function we will use the the patch method , as the update api is a patch api, in the body we will pass all state variable values, and in options we will set withCredentials to true to send token for validation, and with the returned response we will updated the store data  , so the store also gets updated, and now when this api gets called we want that a saved profile profile message should be displayed to show the user,that his data is successfully updated, so from the daisy ui we will copy the top showing toast , and add that in the as a div, no matter where we add it it will be shown in the top, and the we want this to show only for three seconds , so we will create a state variable named showToast and setShowToast function, its initial value will be false, and depending on this showToast this toast will be displayed , as initially it will be false , when the user update his profile ans click on save this setShowToast will get set to true we will write it inside handler function, and then using setTimeOut function we will set it false again after 3 secs.
+
+//!  buttonDisplay={false} and  emailDisplay={true} prop in UserCard component
+//* when we are composition this userCard inside the EditProfile page, as the UserCard component had a ignored and interested button, but here in the user's own profile, we don't these buttons, so we created this button display prop and passing false as it's value , and we will receive this prop inside the userCard component and depending on this prop we will display the buttons, so as we are passing false from here it will not display those buttons , but from the feed page we will pass true so then for the feed page the userCard will display the buttons, and we created another prop named emailDisplay , because in the editProfile page , we want to show the loggedInUser's profile , so we are passing this props value to true, and depending on the prop we are displaying the emailId of the user in the edit profile page, but when we from the feed page we will pass false because we will not display other user;s email to the loggedInUser.
+//*So the whole whole profile comp and editProfile comp will look like below:-
+//* Profile component
+/*
+ * function Profile() {
+ *   const user = useSelector((store) => store.user);
+ *
+ *   return (
+ *     user && (
+ *       <div>
+ *         <EditProfile user={user} />
+ *       </div>
+ *     )
+ *   );
+ * }
+ */
+//* EditProfile component
+/*
+* const EditProfile = ({ user }) => {
+*   console.log(user);
+*   const [error, setError] = useState("");
+*   //* importing dispatch function
+*   const dispatch = useDispatch();
+*   const emailId = user?.data?.emailId;
+*   //* state variables to keep track what user is typing(binding state with ui * components)
+!   const [firstName, setFirstName] = useState(user?.data?.firstName);
+!   const [lastName, setLastName] = useState(user?.data?.lastName);
+!   const [about, setAbout] = useState(user?.data?.about);
+! 
+!   const [skills, setSkills] = useState(user?.data?.skills);
+!   const [age, setAge] = useState(user?.data?.age);
+!   const [photoUrl, setPhotoUrl] = useState(user?.data?.photoUrl);
+!   const [gender, setSelectedGenderValue] = useState(user?.data?.gender);
+! 
+!   const [showToast, setShowToast] = useState(false);
+* 
+!   const handleUpdateProfile = async () => {
+*     try {
+!       setError(""); //* if error happened because of some validation error and * after correcting the error if the user retry then the old error message should * be cleared , that's why at the top to this handler we cleared the error first.
+!       const res = await axios.patch(
+*         BASE_URL + "/profile/edit",
+*         {
+*           firstName,
+*           lastName,
+*           age,
+*           about,
+*           skills,
+*           photoUrl,
+*           gender,
+*         },
+*         { withCredentials: true }
+*       );
+!       dispatch(addUser(res.data));
+*
+!       //* showing toast only for 3 sec
+!       setShowToast(true);
+!       setTimeout(() => {
+!         setShowToast(false);
+!       }, 3000);
+*     } catch (err) {
+!       setError(err?.response?.data?.message + "!!!!");
+*     }
+*   };
+*   return (
+*     <>
+*       <div className="lg:flex lg:flex-row  items-center sm:flex-col  justify-* center lg:grow-0 mt-4 mb-8 ">
+*         <div className="flex justify-center lg:mr-6 mb-6">
+*           <div className="card bg-base-300 w-96 shadow-sm flex justify-center">
+*             <div className="card-body">
+*               <h2 className="card-title justify-center text-2xl">
+*                 Edit Profile
+*               </h2>
+*               <fieldset className="fieldset">
+*                 <legend className="fieldset-legend">First Name</legend>
+*                 <input
+*                   type="text"
+*                   className="input"
+*                   value={firstName}
+*                   onChange={(e) => setFirstName(e.target.value)}
+*                 />
+*               </fieldset>
+*               <fieldset className="fieldset">
+*                 <legend className="fieldset-legend">Last Name</legend>
+*                 <input
+*                   type="text"
+*                   className="input"
+*                   value={lastName}
+*                   onChange={(e) => setLastName(e.target.value)}
+*                 />
+*               </fieldset>
+*               <fieldset className="fieldset">
+*                 <legend className="fieldset-legend">About</legend>
+*                 <input
+*                   type="text"
+*                   className="input"
+*                   value={about}
+*                   onChange={(e) => setAbout(e.target.value)}
+*                 />
+*               </fieldset>
+*               <fieldset className="fieldset">
+*                 <legend className="fieldset-legend">Age</legend>
+*                 <input
+*                   type="text"
+*                   className="input"
+*                   value={age}
+*                   onChange={(e) => setAge(e.target.value)}
+*                 />
+*               </fieldset>
+!               <fieldset className="fieldset">
+!                 <legend className="fieldset-legend text-sm" htmlFor="my-select">
+!                   Select gender:
+!                 </legend>
+!                 <select
+!                   id="my-select"
+!                   value="Please choose an option"
+!                   onChange={(e) => setSelectedGenderValue(e.target.value)}
+!                   className="bg-base-300"
+!                 >
+!                   <option value="">--Please choose an option--</option>
+!                   <option value="male">male</option>
+!                   <option value="female">female</option>
+!                   <option value="others">others</option>
+!                 </select>
+!                 <p className="input">{gender}</p>
+!               </fieldset>
+* 
+*               <fieldset className="fieldset">
+*                 <legend className="fieldset-legend">PhotUrl</legend>
+*                 <input
+*                   type="text"
+*                   className="input"
+*                   value={photoUrl}
+*                   onChange={(e) => setPhotoUrl(e.target.value)}
+*                 />
+*               </fieldset>
+*               <fieldset className="fieldset">
+!                 <legend className="fieldset-legend">Skills</legend>
+*                 <input
+*                   type="text"
+*                   className="input"
+*                   value={skills}
+!                   onChange={(e) => setSkills(e.target.value.split(","))}
+*                 />
+*               </fieldset>
+*               <p className="text-sm text-red-500">{error}</p>
+*               <div className="card-actions my-4  justify-center">
+*                 <button
+*                   className="btn btn-primary flex "
+*                   onClick={handleUpdateProfile}
+*                 >
+*                   Save Profile
+*                 </button>
+*               </div>
+*             </div>
+*           </div>
+*         </div>
+!         <div className="lg:self-start sm:self-center flex justify-center">
+!           <UserCard
+!             feed={{
+!               firstName,
+!               lastName,
+!               about,
+!               age,
+!               skills,
+!               gender,
+!               photoUrl,
+!               emailId,
+!             }}
+!             buttonDisplay={false}
+!             emailDisplay={true}
+!           />
+!         </div>
+*       </div>
+!       {showToast && (
+!         <div className="toast toast-top toast-center">
+!           <div className="alert alert-success">
+!             <span>Profile updated successfully</span>
+!           </div>
+!         </div>
+!       )}
+*     </>
+*   );
+* };
+*/

@@ -18,6 +18,7 @@ const Login = () => {
 
   const handleLogin = async () => {
     try {
+      setError(""); //* if error happened because of some validation error and after correcting the error if the user retry then the old error message should be cleared , that's why at the top to this handler we cleared the error first.
       const data = await axios.post(
         BASE_URL + "/signin",
         {
