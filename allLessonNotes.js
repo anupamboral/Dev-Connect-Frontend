@@ -357,13 +357,14 @@ console.log(handleLogin);
 //* So as we are using The declarative mode in react router Because of this mode we can't use the use router error hook We used in the previous projects So to access the error in the error page First of all we will Error file And in the App jsx file we will add the path "/error" with the element <Error/> , And now We can come back to the Body.jsx, So in the catch block , We navigated The user to the login page when the status code is 401 But when the status quo is something else so some other error has happened In that scenario Redirect the user To the error Using the Navigate hook so we'll first get navigate using Use navigate hook and then we will use this navigate function To navigate the user To the error page But as the useRouterError hook is not present, So we have to use another way to send this error status and error message to the Error component So when we Calling the navigate function As the first argument we are mentioning The path of the error page Now as a second argument we can also pass Some data so we have to mention Object and inside that object we Use a status property and this status property can have a value which can be an object So inside this object we can pass our error message and the error status Now to This error message and the error status We have to go to the error compo End End Inside error .J S X We have Use a hook named useLocation() hook, And from this hook we can get Axis all of the data so first we have to Save this use location hooks value into a constant named location And then from this location we can destructure The status and from that status we can destructure The error message The error status code.
 //! in body.jsx , catch block:-
 /*
- *  navigate("/error", {
- *        state: {
- *          errorMessage:
- *            err.response.data.message + `(${err.response.statusText})`,
- *          errorState: `Status ` + err.response.status,
- *        },
- *      });
+ *     navigate("/error", {
+ *       state: {
+ *         errorMessage: err.response
+ *           ? err.response.data.message + `(${err.response.statusText})`
+ *           : err.message,
+ *         errorState: err.response ? `Status ` + err.response.status : err.code,
+ *       },
+ *     });
  */
 //! in Error.jsx
 /*
@@ -484,13 +485,14 @@ console.log(handleLogin);
  *       //* adding data to the store(feedSlice)
  *       dispatch(addFeed(res.data));
  *     } catch (err) {
- *       navigate("/error", {
- *         state: {
- *           errorMessage:
- *             err?.response?.data?.message + `(${err?.response?.statusText})`,
- *           errorState: `Status ` + err?.response?.status,
- *         },
- *       });
+ *          navigate("/error", {
+ *       state: {
+ *         errorMessage: err.response
+ *           ? err.response.data.message + `(${err.response.statusText})`
+ *           : err.message,
+ *         errorState: err.response ? `Status ` + err.response.status : err.code,
+ *       },
+ *     });
  *       console.error(err.message);
  *     }
  *   };
@@ -709,4 +711,104 @@ console.log(handleLogin);
 *     </>
 *   );
 * };
+*/
+
+//! connections page
+//* to build the connections page , we created a connections link in the navbar, and added the link tag to go to the connections page , and add also in the the route in the app.jsx, then in the connections page , we will make a fetchConnection function to made a api call to user/connections api , with also sending the token by setting withCredentials to true ,and to save the data of the response we will create a connections slice inside utils/connections.js like below:-
+/*
+import { createSlice } from "@reduxjs/toolkit";
+
+const connectionsSlice = createSlice({
+  name: "Feed",
+  initialState: null,
+  reducers: {
+    addConnections: (state, action) => {
+      return action.payload;
+    },
+    removeConnections: () => {
+      return null;
+    },
+  },
+});
+
+export const { addConnections, removeConnections } = connectionsSlice.actions;
+
+export default connectionsSlice.reducer;
+*/
+
+//* and now we will add this connection slice into the store(appstore.js) , so then comeback to our connections component and inside the fetch connection function we will dispatch an addConnections action to add the data to the slice, and then in the top we will subscribe to the store and get the connections data and using the data we will render all of the connections in the in the page, so we will make a header connections and below that we will map the the connections array, and return a connection div for every connection, to build the connection div we get help help from daisy ui(tab - Alert with buttons + responsive) , and we are rendering a connection div for every connection, so the whole component will look like below:-
+/*
+* const Connections = () => {
+*   const navigate = useNavigate();
+*   const dispatch = useDispatch();
+*   const connections = useSelector((store) => store.connections);
+*   const fetchConnection = async () => {
+*     try {
+*       const res = await axios.get(BASE_URL + "/user/connections", {
+*         withCredentials: true,
+*       });
+* 
+*       dispatch(addConnections(res.data.data));
+*     } catch (err) {
+*       navigate("/error", {
+*         state: {
+*           errorMessage: err.response
+*             ? err.response.data.message + `(${err.response.statusText})`
+*             : err.message,
+*           errorState: err.response ? `Status ` + err.response.status : err.code,
+*         },
+*       });
+*       console.error(err.message);
+*     }
+*   };
+*   useEffect(() => {
+*     fetchConnection();
+*     // eslint-disable-next-line react-hooks/exhaustive-deps
+*   }, []);
+* 
+*   // console.log(user);
+* 
+*   if (!connections) return;
+*   if (connections.length === 0) return <h1>No connection found</h1>;
+*   return (
+*     <div>
+*       <div className=" flex justify-center">
+*         <h1 className=" w-62 font-bold text-3xl text-center my-4 bg-clip-text * text-transparent bg-linear-to-r from-fuchsia-500 to-cyan-500">
+*           {" "}
+*           Connections
+*         </h1>
+*       </div>
+*       <div className="max-h-[1000px] min-h-[80dvh] max-w-[90dvw]  lg:mx-auto * overflow-scroll border-2 border-cyan-400 px-2 py-6">
+*         {connections.map((connection) => {
+*           return (
+*             <div className="mb-4 lg:mx-24 bg-base-300 rounded-4xl mx-6">
+*               <div className="flex  justify-start rounded-4xl">
+*                 <div
+*                   role="alert"
+*                   className=" flex justify-around   alert bg-base-300 alert-* vertical sm:alert-horizontal"
+*                 >
+*                   <img
+*                     className="h-36 w-36 rounded-4xl"
+*                     src={connection.photoUrl}
+*                     alt="Shoes"
+*                   />
+*                   <div className="flex flex-col  justify-start">
+*                     <h2 className=" md:self-start  card-title">
+*                       {connection.firstName + " " + connection.lastName}
+*                     </h2>
+*                     {connection.age && connection.gender && (
+*                       <p>{`Age: ${connection.data.age} , ${connection.gender}`}* </p>
+*                     )}
+*                     <p className="text-white">{connection.about}</p>
+*                   </div>
+*                 </div>
+*               </div>
+*             </div>
+*           );
+*         })}
+*       </div>
+*     </div>
+*   );
+* };
+
 */

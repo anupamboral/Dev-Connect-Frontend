@@ -25,14 +25,16 @@ function Body() {
         return navigate("/login"); //* here using return keyword is necessary , if we write return then only it will navigate to login page and stop further execution , but we don't write return then it continue the execution and execute below code , which will again redirect the user to error, and that should not happen in case of 401 unauthorized error, the below code should only execute when some other error happens like 404, 400 or any else but not 401 , so writing return is important to stop further execution
       }
       //* if any other error happens(also sending error data because in declarative mode of react router we can't use useRouterError hook )
+      console.log(err);
       navigate("/error", {
         state: {
-          errorMessage:
-            err?.response?.data?.message + `(${err?.response?.statusText})`,
-          errorState: `Status ` + err?.response?.status,
+          errorMessage: err.response
+            ? err.response.data.message + `(${err.response.statusText})`
+            : err.message,
+          errorState: err.response ? `Status ` + err.response.status : err.code,
         },
       });
-      console.error(err.message);
+      console.log(err.message);
     }
   };
 
@@ -43,7 +45,7 @@ function Body() {
   }, []);
 
   return (
-    <div className="relative">
+    <div className="relative min-h-[1800px]">
       <Navbar />
       <Outlet />
       <Footer />

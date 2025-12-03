@@ -23,7 +23,7 @@ const Navbar = () => {
     //* dispatching action to empty the user data from the redux store
     dispatch(removeUser());
 
-    //*navigating user to login page
+    //* navigating user to login page
     navigate("/login");
   };
 
@@ -65,6 +65,12 @@ const Navbar = () => {
               </li>
               <li>
                 <Link to="/">Feed Page</Link>
+              </li>
+              <li>
+                <Link to="/connections">Connections</Link>
+              </li>
+              <li>
+                <Link to="/requests">Requests</Link>
               </li>
               <li>
                 <a onClick={handleLogOut}>Logout</a>

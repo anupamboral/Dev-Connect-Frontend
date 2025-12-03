@@ -22,11 +22,13 @@ const Feed = () => {
       //* adding data to the store(feedSlice)
       dispatch(addFeed(res.data));
     } catch (err) {
+      console.error(err);
       navigate("/error", {
         state: {
-          errorMessage:
-            err?.response?.data?.message + `(${err?.response?.statusText})`,
-          errorState: `Status ` + err?.response?.status,
+          errorMessage: err.response
+            ? err.response.data.message + `(${err.response.statusText})`
+            : err.message,
+          errorState: err.response ? `Status ` + err.response.status : err.code,
         },
       });
       console.error(err.message);

@@ -51,9 +51,9 @@ const EditProfile = ({ user }) => {
     }
   };
   return (
-    <>
-      <div className="lg:flex lg:flex-row  items-center sm:flex-col  justify-center lg:grow-0 mt-4 mb-8 ">
-        <div className="flex justify-center lg:mr-6 mb-6">
+    <div className="mb-4">
+      <div className="lg:flex lg:flex-row  items-start md:flex-col-reverse  justify-center lg:grow-0 mt-4  ">
+        <div className="edit-profile flex justify-center lg:mr-6 mb-6">
           <div className="card bg-base-300 w-96 shadow-sm flex justify-center">
             <div className="card-body">
               <h2 className="card-title justify-center text-2xl">
@@ -143,7 +143,7 @@ const EditProfile = ({ user }) => {
             </div>
           </div>
         </div>
-        <div className="lg:self-start sm:self-center flex justify-center">
+        <div className="view-profile lg:self-start sm:self-center flex justify-center">
           <UserCard
             feed={{
               firstName,
@@ -167,7 +167,7 @@ const EditProfile = ({ user }) => {
           </div>
         </div>
       )}
-    </>
+    </div>
   );
 };
 

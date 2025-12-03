@@ -34,8 +34,8 @@ const Login = () => {
       //* navigating to feed(/) page
       navigate("/");
     } catch (err) {
-      setError(err?.response?.data?.message + "!!!!");
-      console.error(err.message);
+      setError(err.response ? err.response.data.message + "!!!!" : err.message);
+      console.log(err);
     }
   };
   return (
