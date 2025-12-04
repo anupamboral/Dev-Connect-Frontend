@@ -1,14 +1,36 @@
 import axios from "axios";
-import React, { useEffect } from "react";
+import { useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { BASE_URL } from "../utils/constants";
 import { useNavigate } from "react-router-dom";
-import { addRequests } from "../utils/requests";
+import { addRequests, removeRequest } from "../utils/requestsSlice";
 
 const Requests = () => {
   const navigate = useNavigate();
   const dispatch = useDispatch();
   const requests = useSelector((store) => store.requests);
+
+  const handleReviewRequest = async (status, connectionRequestId) => {
+    try {
+      const res = await axios.post(
+        BASE_URL + "/request/review/" + status + "/" + connectionRequestId,
+        {},
+        { withCredentials: true }
+      );
+      console.log(res.data.data);
+      dispatch(removeRequest(connectionRequestId));
+    } catch (err) {
+      navigate("/error", {
+        state: {
+          errorMessage: err.response
+            ? err.response.data.message + `(${err.response.statusText})`
+            : err.message,
+          errorState: err.response ? `Status ` + err.response.status : err.code,
+        },
+      });
+      console.error(err.message);
+    }
+  };
 
   const fetchRequests = async () => {
     try {
@@ -62,24 +84,36 @@ const Requests = () => {
                     <div className=" self-start">
                       <img
                         className="h-36 w-36 rounded-4xl"
-                        src={request.photoUrl}
+                        src={request.fromUserId.photoUrl}
                         alt="Shoes"
                       />
                     </div>
                     <div className="flex flex-col  align-">
                       <h2 className="self-center md:self-start  card-title">
-                        {request.firstName + " " + request.lastName}
+                        {request.fromUserId.firstName +
+                          " " +
+                          request.fromUserId.lastName}
                       </h2>
-                      {request.age && request.gender && (
-                        <p className="text-xs uppercase font-semibold opacity-60">{`Age: ${request.age} , ${request.gender}`}</p>
+                      {request.fromUserId.age && request.fromUserId.gender && (
+                        <p className="text-xs uppercase font-semibold opacity-60">{`Age: ${request.fromUserId.age} , ${request.fromUserId.gender}`}</p>
                       )}
-                      <p className="text-white">{request.about}</p>
+                      <p className="text-white">{request.fromUserId.about}</p>
                     </div>
                     <div className="flex md:flex-col ">
-                      <button className="btn btn-sm btn-secondary lg:mt-2 my-2  mx-2">
+                      <button
+                        onClick={() => {
+                          handleReviewRequest("accepted", request._id);
+                        }}
+                        className="btn btn-sm btn-secondary lg:mt-2 my-2  mx-2"
+                      >
                         Accept
                       </button>
-                      <button className="btn btn-sm btn-primary my-2 mx-2">
+                      <button
+                        onClick={() => {
+                          handleReviewRequest("rejected", request._id);
+                        }}
+                        className="btn btn-sm btn-primary my-2 mx-2"
+                      >
                         Reject
                       </button>
                     </div>
@@ -95,35 +129,3 @@ const Requests = () => {
 };
 
 export default Requests;
-/*      <div className="mb-4 lg:mx-48 bg-base-300 rounded-4xl mx-6">
-        <div className="flex bg-base-300 justify-center rounded-4xl">
-          <div
-            role="alert"
-            className="  alert bg-base-300 alert-vertical sm:alert-horizontal"
-          >
-            <img
-              className="h-36 w-36 rounded-4xl"
-              src={user.data.photoUrl}
-              alt="Shoes"
-            />
-            <div className="flex flex-col  align-">
-              <h2 className="self-center md:self-start  card-title">
-                {user.data.firstName + " " + user.data.lastName}
-              </h2>
-              {user.data.age && user.data.gender && (
-                <p>{`Age: ${user.data.age} , ${user.data.gender}`}</p>
-              )}
-              <p className="text-white">{user.data.about}</p>
-            </div>
-
-            <div className="flex md:flex-col ">
-              <button className="btn btn-sm btn-secondary lg:mt-2 my-2  mx-2">
-                Accept
-              </button>
-              <button className="btn btn-sm btn-primary my-2 mx-2">
-                Reject
-              </button>
-            </div>
-          </div>
-        </div>
-      </div>*/

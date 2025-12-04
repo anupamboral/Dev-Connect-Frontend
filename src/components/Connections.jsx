@@ -3,7 +3,7 @@ import { useDispatch, useSelector } from "react-redux";
 
 import { BASE_URL } from "../utils/constants";
 import { useNavigate } from "react-router-dom";
-import { addConnections } from "../utils/connections";
+import { addConnections } from "../utils/connectionsSlice";
 import axios from "axios";
 
 const Connections = () => {

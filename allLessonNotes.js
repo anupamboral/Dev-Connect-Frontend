@@ -812,3 +812,154 @@ export default connectionsSlice.reducer;
 * };
 
 */
+//!requests page
+//* so we hav e added the link in the nav bar so we can go to the navigation page, and then to we created a requests.js file and created a requests component inside it we will create a fetchRequests function to fetch all the requests , where we are calling the /user/requests/received api with sending the token and then getting the response and to save this response we will make a requestSlice inside utils/requestsSlice.js , so there is a addRequest action which add all the requests in the state. and there is removeRequest action  which can remove a single request from the requests array if some request gets accepted or rejected , and return a new array which will not included the accepted or rejected request.and add the slice into the appStore(redux store) so the slice will look like below:-
+/*
+ * const requestsSlice = createSlice({
+ *   name: "Feed",
+ *   initialState: null,
+ *   reducers: {
+ *     addRequests: (state, action) => {
+ *       return action.payload;
+ *     },
+ *     removeRequest: (state, action) => {
+ *       //* from the state connection requests , this filter method will  remove * that connection request doc which id is matching with action.payload(connectionRequestId)(so * which request is accepted or rejected) and filter out all the requests which are * in pending state except the connection request that is accepted or rejected,so * newRequest will only include  the remaining pending requests.
+ *       const newRequests = state.filter(
+ *         (request) => request._id !== action.payload
+ *       );
+ *       return newRequests; //* returning updated requests(removed reviewed * request)
+ *     },
+ *   },
+ * });
+ *
+ * export const { addRequests, removeRequest } = requestsSlice.actions;
+ *
+ * export default requestsSlice.reducer;
+ */
+//* so after fetching the requests we will add all requests in the store by dispatching the addRequests() action , then we will subscribe to the store to get all the requests and then using the data we will display all the requests using map() and looping the requests data, so every request will have a accept and reject btn on the ui, and when the user will click on these buttons we will call a function named handleReviewRequest(status, connectionRequestId); so we will make this function and this function will take args one is the status, which can be accepted or rejected depending on the button, so we will be hanrd coding while passing it the to function and the second srg will the connection request id which we will get from the the request we are displaying using the map method so request._id. and this handleReviewRequest function make a api call to the /request/review/:status/:connectionRequestId , api, where we will pass this status and connectionRequestId we we got from the args , and then it will return the connectionRequest doc which is now updated as accepted or rejected , and now we will remove the request from the existing pending request, present in out request slice's state , using the removeRequest action, so we will pass the response doc while calling the action, and the removeRequest slice will filted using this connection request doc, so , the removeRequest action will filter all other docs which not matching with this doc's _id , and give a filtered array of pending request, so the state of the store will be updated and the ui will only display the pending requests, so the whole requests api will look like below:-
+/*
+* const Requests = () => {
+*   const navigate = useNavigate();
+*   const dispatch = useDispatch();
+*   const requests = useSelector((store) => store.requests);
+* 
+!   const handleReviewRequest = async (status, connectionRequestId) => {
+*     try {
+*       const res = await axios.post(
+!         BASE_URL + "/request/review/" + status + "/" + connectionRequestId,
+!         {},
+!         { withCredentials: true }
+*       );
+*       console.log(res.data.data);
+!       dispatch(removeRequest(connectionRequestId));
+*     } catch (err) {
+*       navigate("/error", {
+*         state: {
+*           errorMessage: err.response
+*             ? err.response.data.message + `(${err.response.statusText})`
+*             : err.message,
+*           errorState: err.response ? `Status ` + err.response.status : err.code,
+*         },
+*       });
+*       console.error(err.message);
+*     }
+*   };
+* 
+!   const fetchRequests = async () => {
+!     try {
+!       const res = await axios.get(BASE_URL + "/user/requests/received", {
+!         withCredentials: true,
+*       });
+*       console.log(res.data.data);
+!       dispatch(addRequests(res?.data?.data || []));
+*     } catch (err) {
+*       navigate("/error", {
+*         state: {
+*           errorMessage: err.response
+*             ? err.response.data.message + `(${err.response.statusText})`
+*             : err.message,
+*           errorState: err.response ? `Status ` + err.response.status : err.code,
+*         },
+*       });
+*       console.error(err.message);
+*     }
+*   };
+* 
+!   useEffect(() => {
+*     fetchRequests();
+*     // eslint-disable-next-line react-hooks/exhaustive-deps
+!   }, []);
+* 
+!   if (!requests) return; //*early return
+!   if (requests.length === 0)
+*     return <h1 className="text-center text-3xl">No connection found</h1>;
+* 
+!   return (
+!     requests && (
+*       <div>
+*         <div className=" flex justify-center mx-auto">
+*           <h1 className=" w-62 font-bold text-3xl text-center my-4 bg-clip-text * text-transparent bg-linear-to-r from-fuchsia-500 to-cyan-500">
+*             Requests
+*           </h1>
+*         </div>
+*         <div className="max-h-[1000px] max-w-[90dvw] min-h-[80dvh] lg:mx-auto * overflow-scroll border-2 border-cyan-400 px-2 py-6">
+!           {requests.map((request) => {
+*             return (
+*               <div
+!                 key={crypto.randomUUID()}
+*                 className="mb-4 lg:mx-24 bg-base-300 rounded-4xl mx-6"
+*               >
+*                 <div className=" bg-base-300 rounded-4xl">
+*                   <div
+*                     role="alert"
+*                     className="  alert bg-base-300 alert-vertical sm:alert-* horizontal"
+*                   >
+*                     <div className=" self-start">
+*                       <img
+*                         className="h-36 w-36 rounded-4xl"
+*                         src={request.fromUserId.photoUrl}
+*                         alt="Shoes"
+*                       />
+*                     </div>
+*                     <div className="flex flex-col  align-">
+*                       <h2 className="self-center md:self-start  card-title">
+*                         {request.fromUserId.firstName +
+*                           " " +
+*                           request.fromUserId.lastName}
+*                       </h2>
+!                       {request.fromUserId.age && request.fromUserId.gender && (
+*                         <p className="text-xs uppercase font-semibold opacity-* 60">{`Age: ${request.fromUserId.age} , ${request.fromUserId.gender}`}</p>
+*                       )}
+*                       <p className="text-white">{request.fromUserId.about}</p>
+*                     </div>
+*                     <div className="flex md:flex-col ">
+*                       <button
+!                         onClick={() => {
+!                           handleReviewRequest("accepted", request._id);
+*                         }}
+*                         className="btn btn-sm btn-secondary lg:mt-2 my-2  mx-2"
+*                       >
+*                         Accept
+*                       </button>
+*                       <button
+!                         onClick={() => {
+!                           handleReviewRequest("rejected", request._id);
+*                         }}
+*                         className="btn btn-sm btn-primary my-2 mx-2"
+*                       >
+*                         Reject
+*                       </button>
+*                     </div>
+*                   </div>
+*                 </div>
+*               </div>
+*             );
+*           })}
+*         </div>
+*       </div>
+*     )
+*   );
+* };
+
+*/
+//* write all comments of implementing sending connection request feature(interested or ignore)

@@ -20,7 +20,7 @@ const Feed = () => {
       });
       // console.log(res);
       //* adding data to the store(feedSlice)
-      dispatch(addFeed(res.data));
+      dispatch(addFeed(res.data.data));
     } catch (err) {
       console.error(err);
       navigate("/error", {
@@ -43,11 +43,7 @@ const Feed = () => {
   return (
     feed && (
       <div className="flex justify-center ">
-        <UserCard
-          feed={feed.data[0]}
-          buttonDisplay={true}
-          emailDisplay={false}
-        />
+        <UserCard feed={feed[0]} buttonDisplay={true} emailDisplay={false} />
       </div>
     )
   );
