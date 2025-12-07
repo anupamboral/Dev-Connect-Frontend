@@ -42,6 +42,25 @@ const Login = () => {
       console.log(err);
     }
   };
+  const handleSignUp = async () => {
+    try {
+      setError(""); //* if error happened because of some validation error and after correcting the error if the user retry then the old error message should be cleared , that's why at the top to this handler we cleared the error first.
+      const data = await axios.post(
+        BASE_URL + "/signup",
+        { firstName, lastName, emailId, password },
+        { withCredentials: true }
+      );
+      //* setting this withCredentials to true is important to save the cookies into browser.either it will send cookies but not save in the browser.
+      console.log(data.data);
+      //* dispatching action to add the returned user data to the userSlice in the redux store
+      dispatch(addUser(data.data));
+      //* navigating to profile(/profile) page
+      navigate("/profile");
+    } catch (err) {
+      setError(err.response ? err.response.data.message + "!!!!" : err.message);
+      console.log(err);
+    }
+  };
   return (
     <div className="flex justify-center mt-4">
       <div className="card bg-base-300 w-96 shadow-sm flex justify-center">
@@ -103,8 +122,11 @@ const Login = () => {
           </fieldset>
           <p className="text-sm text-red-500">{error}</p>
           <div className=" card-actions my-4  justify-center">
-            <button className="btn btn-primary flex " onClick={handleLogin}>
-              Log In
+            <button
+              className="btn btn-primary flex "
+              onClick={isLogInForm ? handleLogin : handleSignUp}
+            >
+              {isLogInForm ? "Log In" : "Sign Up"}
             </button>
           </div>
           <p

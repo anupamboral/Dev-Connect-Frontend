@@ -56,7 +56,9 @@ const UserCard = (props) => {
       <div className="card-body">
         <h2 className="card-title">{firstName + " " + lastName}</h2>
         {emailDisplay && <p className="text-white">Email id:- {emailId}</p>}
-        {age && gender && <p>{`Age: ${age} , ${gender}`}</p>}
+        {age && gender && (
+          <p className="text-xs uppercase font-semibold opacity-60">{`Age: ${age} , ${gender}`}</p>
+        )}
         <p className="text-white">{about}</p>
 
         <div className="mb-1">

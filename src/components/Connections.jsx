@@ -46,29 +46,31 @@ const Connections = () => {
           Connections
         </h1>
       </div>
-      <div className="max-h-[1000px] min-h-[80dvh] max-w-[90dvw]  lg:mx-auto overflow-scroll border-2 border-cyan-400 px-2 py-6">
+      <div className="max-h-[1000px] min-h-[80dvh] max-w-[90dvw]  mx-auto overflow-scroll border-2 border-cyan-400 px-2 py-6">
         {connections.map((connection) => {
           return (
             <div
               key={crypto.randomUUID()}
               className="mb-4 lg:mx-24 bg-base-300 rounded-4xl mx-6"
             >
-              <div className="flex  justify-start rounded-4xl">
+              <div className="   rounded-4xl">
                 <div
                   role="alert"
-                  className=" flex justify-around   alert bg-base-300 alert-vertical sm:alert-horizontal"
+                  className="    alert bg-base-300 alert-vertical sm:alert-horizontal"
                 >
-                  <img
-                    className="h-36 w-36 rounded-4xl"
-                    src={connection.photoUrl}
-                    alt="Shoes"
-                  />
+                  <div className=" self-start">
+                    <img
+                      className="  h-36 w-36 rounded-4xl"
+                      src={connection.photoUrl}
+                      alt="Shoes"
+                    />
+                  </div>
                   <div className="flex flex-col  justify-start">
-                    <h2 className=" md:self-start  card-title">
+                    <h2 className="self-center md:self-start  card-title">
                       {connection.firstName + " " + connection.lastName}
                     </h2>
-                    {connection.age && connection.gender && (
-                      <p>{`Age: ${connection.data.age} , ${connection.gender}`}</p>
+                    {connection?.age && connection?.gender && (
+                      <p>{`Age: ${connection?.age} , ${connection?.gender}`}</p>
                     )}
                     <p className="text-white">{connection.about}</p>
                   </div>

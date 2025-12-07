@@ -69,7 +69,7 @@ const Requests = () => {
             Requests
           </h1>
         </div>
-        <div className="max-h-[1000px] max-w-[90dvw] min-h-[80dvh] lg:mx-auto overflow-scroll border-2 border-cyan-400 px-2 py-6">
+        <div className="max-h-[1000px] max-w-[90dvw] min-h-[80dvh] mx-auto overflow-scroll border-2 border-cyan-400 px-2 py-6">
           {requests.map((request) => {
             return (
               <div
@@ -88,7 +88,7 @@ const Requests = () => {
                         alt="Shoes"
                       />
                     </div>
-                    <div className="flex flex-col  align-">
+                    <div className="flex flex-col  ">
                       <h2 className="self-center md:self-start  card-title">
                         {request.fromUserId.firstName +
                           " " +

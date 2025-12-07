@@ -13,14 +13,14 @@ const EditProfile = ({ user }) => {
   const dispatch = useDispatch();
   const emailId = user?.data?.emailId;
   //* state variables to keep track what user is typing(binding state with ui components)
-  const [firstName, setFirstName] = useState(user?.data?.firstName);
-  const [lastName, setLastName] = useState(user?.data?.lastName);
-  const [about, setAbout] = useState(user?.data?.about);
+  const [firstName, setFirstName] = useState(user?.data?.firstName || "");
+  const [lastName, setLastName] = useState(user?.data?.lastName || "");
+  const [about, setAbout] = useState(user?.data?.about || "");
 
-  const [skills, setSkills] = useState(user?.data?.skills);
-  const [age, setAge] = useState(user?.data?.age);
-  const [photoUrl, setPhotoUrl] = useState(user?.data?.photoUrl);
-  const [gender, setSelectedGenderValue] = useState(user?.data?.gender);
+  const [skills, setSkills] = useState(user?.data?.skills || []);
+  const [age, setAge] = useState(user?.data?.age || 18);
+  const [photoUrl, setPhotoUrl] = useState(user?.data?.photoUrl || "");
+  const [gender, setSelectedGenderValue] = useState(user?.data?.gender || "");
 
   const [showToast, setShowToast] = useState(false);
 
@@ -163,7 +163,7 @@ const EditProfile = ({ user }) => {
       {showToast && (
         <div className="toast toast-top toast-center">
           <div className="alert alert-success">
-            <span>Profile updated successfully</span>
+            <span className="text-black">Profile updated successfully</span>
           </div>
         </div>
       )}
