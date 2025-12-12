@@ -962,5 +962,264 @@ export default connectionsSlice.reducer;
 * };
 
 */
-//* write all comments of implementing sending connection request feature(interested or ignore)
-//*Jeff Pappas
+//! Connection request sending feature on the user feed
+//* on the feed we are displaying UserCard components , with interested and ignore buttons , so as the same UserCard we are displaying on the profile edit page , so there we don't need these buttons so using a prop when we are displaying the user card component in the profile page we are not displaying the buttons but when we are displaying the card on the feed then we are displaying the buttons, so when we are on the feed page we want that, when the user click on the interested btn then a request should should send to him and when it gets ignored it gets saved with ignored status, so basically onClick of the button we will call the request sending api, to do that inside the userCard component we will create a handleSendRequest function this will received the status and the userId as arguments and then using the args it will call the api and then dispatch an action to remove the user so the to remove the user we will also add a action in the feed slice named removeFeedUser , which will remove that user from the feed array , so the handleSendRequest function in user card will look like:-
+/*  const handleSendRequest = async (status, userId) => {
+    console.log(userId);
+    try {
+      const res = await axios.post(
+        BASE_URL + "/request/send/" + status + "/" + userId,
+        {},
+        { withCredentials: true }
+      );
+      console.log(res.data.data);
+      dispatch(removeFeedUser(userId));
+    } catch (err) {
+      navigate("/error", {
+        state: {
+          errorMessage: err.response
+            ? err.response.data.message + `(${err.response.statusText})`
+            : err.message,
+          errorState: err.response ? `Status ` + err.response.status : err.code,
+        },
+      });
+      console.error(err.message);
+    }
+};
+  */
+//* and the removeUser action in the feedSlice will look like:-
+
+/* 
+  * removeFeedUser: (state, action) => {
+      //* returning all user objects except the user object to whom the connection request is sent(interested or ignored card). in action .payload we are sending the id of request sent user, and using the filter method we are filtering all the objects from feed array using the request sent user's id coming from action.payload, creating a new array where request sent user's object is not present. and returning the updated array.
+*      const updatedFeed = state.filter((user) => user._id !== action.payload);
+*      return updatedFeed;
+    },*/
+
+//* so the whole UserCard component will look like below:-
+/*
+const UserCard = (props) => {
+  const navigate = useNavigate();
+  const dispatch = useDispatch();
+  console.log(props.feed);
+  const {
+    firstName,
+    lastName,
+    age,
+    about,
+    skills,
+    photoUrl,
+    gender,
+    emailId,
+    _id,
+  } = props.feed;
+
+  const { buttonDisplay, emailDisplay } = props;
+
+  const handleSendRequest = async (status, userId) => {
+    console.log(userId);
+    try {
+      const res = await axios.post(
+        BASE_URL + "/request/send/" + status + "/" + userId,
+        {},
+        { withCredentials: true }
+      );
+      console.log(res.data.data);
+      dispatch(removeFeedUser(userId));
+    } catch (err) {
+      navigate("/error", {
+        state: {
+          errorMessage: err.response
+            ? err.response.data.message + `(${err.response.statusText})`
+            : err.message,
+          errorState: err.response ? `Status ` + err.response.status : err.code,
+        },
+      });
+      console.error(err.message);
+    }
+  };
+
+  return (
+    <div className="  self-center card bg-base-300 w-96 shadow-sm m-2">
+      <figure>
+        <img className="h-72 w-92" src={photoUrl} alt="Shoes" />
+      </figure>
+      <div className="card-body">
+        <h2 className="card-title">{firstName + " " + lastName}</h2>
+        {emailDisplay && <p className="text-white">Email id:- {emailId}</p>}
+        {age && gender && (
+          <p className="text-xs uppercase font-semibold opacity-60">{`Age: ${age} , ${gender}`}</p>
+        )}
+        <p className="text-white">{about}</p>
+
+        <div className="mb-1">
+          <ul className="menu menu-horizontal bg-base-200 rounded-box">
+            <li className=" text-lg font-bold mr-1">Skills:-</li>
+            {skills &&
+              skills.map((skill) => (
+                <li
+                  key={crypto.randomUUID()}
+                  className="btn-sm mb-1 mx-1 bg-green-400 text-black p-1 font-bold rounded  "
+                >
+                  {skill}
+                </li>
+              ))}
+          </ul>
+        </div>
+        {buttonDisplay && (
+          <div className="card-actions justify-center ">
+            <button
+              onClick={() => {
+*               handleSendRequest("ignored", _id);
+              }}
+              className="btn btn-primary"
+            >
+              Ignore
+            </button>
+            <button
+              onClick={() => {
+*                handleSendRequest("interested", _id);
+              }}
+              className="btn btn-secondary ml-2"
+            >
+              Interested
+            </button>
+          </div>
+        )}
+      </div>
+    </div>
+  );
+};
+*/
+//* now in the feed component we will already written the logic of fetching the feed users, and saving the users array in the user slice, but this fetchFeedData function only fetch the data of 10 user so , when the feed array becomes empty,we need a condition to load again new feed users so we written then logic , to show  a skeleton card with button on click this skelton or btn it will again call the fetchFeedData function and update the feed, and also we have to write the logic when there are now new users remaining then api will respond empty array so then setting the feed to null, which will display , no new users found message .
+//* so in the fetchFeedData function we added a condition , that if the api responded empty array then set the feed slice value to null, but when response array has data , then add feed users to the feed slice like below:-
+/* in fetchFeedData function
+ *     res.data.data.length === 0
+ *        ? dispatch(addFeed(null))
+ *        : dispatch(addFeed(res.data.data));
+ */
+
+//* logic to show the skeleton card  when feed array is empty , so fetch new users
+/*
+  if (feed.length === 0) {
+    return (
+      <div className=" flex flex-col justify-center items-center mx-auto">
+        <h1 className=" w-62 font-bold text-3xl text-center my-4 bg-clip-text text-transparent bg-linear-to-r from-fuchsia-500 to-cyan-500">
+          Load new users
+        </h1>
+
+        <div
+          onClick={() => {
+            fetchFeedData();
+          }}
+          className="flex w-74 flex-col gap-4 mt-4"
+        >
+          <div className="skeleton h-44 w-full"></div>
+
+          <div className="skeleton h-4 w-28"></div>
+          <div className="skeleton h-4 w-full"></div>
+          <div className="skeleton h-4 w-full"></div>
+          <button className="btn btn-primary bg-cyan-400 p-2 text-black ">
+            Show New Users
+          </button>
+        </div>
+      </div>
+    );
+  }
+*/
+//* logic to show no new users found when the api responded empty array and feed slice is set to null
+/*
+  if (!feed) {
+    //* Early return
+    return (
+      <div className=" flex justify-center mx-auto">
+        <h1 className=" w-62 font-bold text-3xl text-center my-4 bg-clip-text text-transparent bg-linear-to-r from-fuchsia-500 to-cyan-500">
+          No new Users Found
+        </h1>
+      </div>
+    );
+  }
+  */
+//* so the whole feed component will look like:-
+/*
+ const Feed = () => {
+  const dispatch = useDispatch();
+  const navigate = useNavigate();
+  const feed = useSelector((store) => store.feed);
+
+  const fetchFeedData = async () => {
+    //! when we are making a get call, we don't pass anything inside body as it is a get call , so second param for body which is a { } is not required, so for get call second param will be object for options where can set the withCredentials to true, but for post call always the second param will be for request body, and third param will be for options.
+    try {
+      const res = await axios.get(BASE_URL + "/user/feed", {
+        withCredentials: true,
+      });
+      console.log(res);
+      //* adding data to the store(feedSlice)(when there is no new user is found and api responded empty array them setting the feed state to null which will show no new users found message)
+      res.data.data.length === 0
+        ? dispatch(addFeed(null))
+        : dispatch(addFeed(res.data.data));
+    } catch (err) {
+      console.error(err);
+      navigate("/error", {
+        state: {
+          errorMessage: err.response
+            ? err.response.data.message + `(${err.response.statusText})`
+            : err.message,
+          errorState: err.response ? `Status ` + err.response.status : err.code,
+        },
+      });
+      console.error(err.message);
+    }
+  };
+
+*  useEffect(() => {
+    fetchFeedData();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+*  }, []); //* empty dependency array to render it only on first mount
+
+  if (!feed) {
+    //* Early return
+    return (
+      <div className=" flex justify-center mx-auto">
+        <h1 className=" w-62 font-bold text-3xl text-center my-4 bg-clip-text text-transparent bg-linear-to-r from-fuchsia-500 to-cyan-500">
+          No new Users Found
+        </h1>
+      </div>
+    );
+  }
+
+ * if (feed.length === 0) {
+    return (
+      <div className=" flex flex-col justify-center items-center mx-auto">
+        <h1 className=" w-62 font-bold text-3xl text-center my-4 bg-clip-text text-transparent bg-linear-to-r from-fuchsia-500 to-cyan-500">
+          Load new users
+        </h1>
+
+        <div
+          onClick={() => {
+            fetchFeedData();
+          }}
+          className="flex w-74 flex-col gap-4 mt-4"
+        >
+          <div className="skeleton h-44 w-full"></div>
+
+          <div className="skeleton h-4 w-28"></div>
+          <div className="skeleton h-4 w-full"></div>
+          <div className="skeleton h-4 w-full"></div>
+          <button className="btn btn-primary bg-cyan-400 p-2 text-black ">
+            Show New Users
+          </button>
+        </div>
+      </div>
+    );
+  }
+
+  return (
+*    feed && (
+*      <div className="flex justify-center ">
+*        <UserCard feed={feed[0]} buttonDisplay={true} emailDisplay={false} />
+*      </div>
+*    )
+  );
+};
+*/

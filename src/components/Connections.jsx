@@ -42,7 +42,6 @@ const Connections = () => {
     <div>
       <div className=" flex justify-center">
         <h1 className=" w-62 font-bold text-3xl text-center my-4 bg-clip-text text-transparent bg-linear-to-r from-fuchsia-500 to-cyan-500">
-          {" "}
           Connections
         </h1>
       </div>
