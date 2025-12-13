@@ -53,7 +53,7 @@ const UserCard = (props) => {
       <figure>
         <img className="h-72 w-92" src={photoUrl} alt="Shoes" />
       </figure>
-      <div className="card-body">
+      <div className="card-body p-4">
         <h2 className="card-title">{firstName + " " + lastName}</h2>
         {emailDisplay && <p className="text-white">Email id:- {emailId}</p>}
         {age && gender && (

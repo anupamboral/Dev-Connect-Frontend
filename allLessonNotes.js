@@ -32,7 +32,9 @@
 //* but now if we go to browser and go to this path:- http://localhost:5173/login still we will not see the login page on the ui because inside the body component we have given any place to render the child components , so to make it work we have to go inside the body component and add a  Outlet component, below the navbar so other child components render inside it, and as navbar will be present inside the Body always , so inside other components we don't need to write navbar component.
 
 //* And we have also created a footer to added that below the Outlet component so every page will have a footer.
-//* write comments about log in page, (useState for email and password)
+
+//! ⁢Season 2 - Episode - 16 - DevtinderUi Part-2
+//! log in page, (useState for email and password)
 
 //* in the log in page , to keep track of what the user is typing we will create a useState variable for both email and password like below,
 //*  const [emailId, setEmailId] = useState("");
@@ -316,6 +318,7 @@ console.log(handleLogin);
 //* now we will do some refactoring, so when we are making api call to the server in the login page, then we should not write url directly , so we make a , constants file inside the utils folder and the we will write the , the BASE_URL as a constant and export it then import it in the login page and use that like :-         BASE_URL + "/signin",
 //* and also we should not keep other components inside the src like this, so inside the src folder we will make a components folder inside src folder and and move other components inside the components folder except the app.jsx,main.jsx,index.css.So we will also update the imports , of these moved files.
 
+//! ⁢Season 2 - Episode - 17 - DevtinderUi Part-2
 //! keep logged in feature while refreshing the browser
 //* So whenever we go to a website and log in then we come after some time Will still see that Our profile is logged in So it has not automatically logged out And that happens because The browser saves the token sent by The server and then using that token The browser again fetches the User data  and shows in the ui that we are logged in .
 //*But In case of our website even Token is stored in the browser but still when we're reloading the browser Our Profile gets logged out so how can we implement the feature that when we reload the browser or come to our website after some time then still our profile Remains logged in So to implement this Feature As we know that Our token is present inside the browser  And When the user Will load Any page of our website I like the profile page or the feed page all of these pages will be loaded inside the body so basically to load every page Our body will be loaded So we have to go inside Our body component Where every other component loads inside the outlet component And inside this body component We will fetch the user Using the profile view api we built in the back end So we will create a function named fetchUser And inside it we'll call our /profile/view api And fetch the user From the server
@@ -713,6 +716,7 @@ console.log(handleLogin);
 * };
 */
 
+//! ⁢Season 2 - Episode - 18 - DevtinderUi Part-4
 //! connections page
 //* to build the connections page , we created a connections link in the navbar, and added the link tag to go to the connections page , and add also in the the route in the app.jsx, then in the connections page , we will make a fetchConnection function to made a api call to user/connections api , with also sending the token by setting withCredentials to true ,and to save the data of the response we will create a connections slice inside utils/connections.js like below:-
 /*
@@ -962,6 +966,8 @@ export default connectionsSlice.reducer;
 * };
 
 */
+
+//! ⁢Season 2 - Episode - 19 - DevtinderUi Part-5
 //! Connection request sending feature on the user feed
 //* on the feed we are displaying UserCard components , with interested and ignore buttons , so as the same UserCard we are displaying on the profile edit page , so there we don't need these buttons so using a prop when we are displaying the user card component in the profile page we are not displaying the buttons but when we are displaying the card on the feed then we are displaying the buttons, so when we are on the feed page we want that, when the user click on the interested btn then a request should should send to him and when it gets ignored it gets saved with ignored status, so basically onClick of the button we will call the request sending api, to do that inside the userCard component we will create a handleSendRequest function this will received the status and the userId as arguments and then using the args it will call the api and then dispatch an action to remove the user so the to remove the user we will also add a action in the feed slice named removeFeedUser , which will remove that user from the feed array , so the handleSendRequest function in user card will look like:-
 /*  const handleSendRequest = async (status, userId) => {
@@ -1223,3 +1229,12 @@ const UserCard = (props) => {
   );
 };
 */
+
+//! ⁢Season 3 - Episode - 8 - Building Real-time Live Chat Feature
+//* season 3 other episodes are about hosting the backend and frontend  , sending emails using aws ses,payment gateway integration with razorpay, so we will host in another place as aws want credit card details, and razorpay need to  verify kyc , so we will build the live chat feature using socket.io .
+//*What Socket.IO is
+//*Socket.IO is a library that enables low-latency, bidirectional and event-based communication between a client and a server.
+//* remember these three words ,it enables low latency, bidirectional, event based communication.
+//* low latency means the connection is fast,
+//* Bidirectional sockets allow data to flow both ways (send/receive) over a single connection, ideal for real-time interaction (like chats, WebSockets), while unidirectional sockets permit data flow in only one direction, used for simpler tasks like monitoring or logging where one side sends data and the other just listens.
+//*Event-based communication in socket connections means it uses an event-driven model where the client and server exchange named events (like 'userTyping', 'messageReceived') over an open, persistent connection (often WebSockets) instead of traditional request/response, allowing for real-time, low-latency, bidirectional data flow, ideal for chat apps or collaborative tools. It relies on an event loop: waiting for events, executing handlers (like socket.on('event', handler)), and emitting new events (like socket.emit('event', data)).
