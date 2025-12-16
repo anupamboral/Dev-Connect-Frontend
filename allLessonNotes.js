@@ -1229,7 +1229,18 @@ const UserCard = (props) => {
   );
 };
 */
-
+//! ⁢Season 3 - Episode - 7 - Payment gateway integration
+//* we will create a premium purchase feature where will integrate  razorpay to get the payments,, so mainly there are two steps one is creating the order, second is payment verification.
+//* so every thing does not happen from the frontend , there is a secret key in the backend using which every thing happens.
+//*then we will go to razorpay and sign up and provide the kyc details to verify, it is safe to provide.
+//* razorpay payment process(see :-src\images\razorpay payment process.png)
+//*1.when user click on pay now button on website, Frontend will make api call to backend to create a order in razorpay, because frontend can't directly talk to razorpay, because secret key is only available  on backend .
+//*2.backends makes a api call, to razorpay with secret key to create a order
+//*3. razorpay creates a order id and send back to backend
+//*4. backend sends order id to the frontend,this order id is public is it is safe to send to frontend
+//*6. when payment is done,then razorpay immediately notifies,the backend using a webhook and send a payment id with signature and backend verify  the payment using payment id and signature.
+//*7. Then front end ask to Back end making an api call if the payment is completed Or not
+//*8. Backend completed verification that time, it return frontend response to frontend that verification .
 //! ⁢Season 3 - Episode - 8 - Building Real-time Live Chat Feature
 //* season 3 other episodes are about hosting the backend and frontend  , sending emails using aws ses,payment gateway integration with razorpay, so we will host in another place as aws want credit card details, and razorpay need to  verify kyc , so we will build the live chat feature using socket.io .
 //*What Socket.IO is
@@ -1238,3 +1249,4 @@ const UserCard = (props) => {
 //* low latency means the connection is fast,
 //* Bidirectional sockets allow data to flow both ways (send/receive) over a single connection, ideal for real-time interaction (like chats, WebSockets), while unidirectional sockets permit data flow in only one direction, used for simpler tasks like monitoring or logging where one side sends data and the other just listens.
 //*Event-based communication in socket connections means it uses an event-driven model where the client and server exchange named events (like 'userTyping', 'messageReceived') over an open, persistent connection (often WebSockets) instead of traditional request/response, allowing for real-time, low-latency, bidirectional data flow, ideal for chat apps or collaborative tools. It relies on an event loop: waiting for events, executing handlers (like socket.on('event', handler)), and emitting new events (like socket.emit('event', data)).
+//! for production upload, change the constants url to actual one, before making the dist folder
