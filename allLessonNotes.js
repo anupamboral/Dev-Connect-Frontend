@@ -1241,6 +1241,11 @@ const UserCard = (props) => {
 //*6. when payment is done,then razorpay immediately notifies,the backend using a webhook and send a payment id with signature and backend verify  the payment using payment id and signature.
 //*7. Then front end ask to Back end making an api call if the payment is completed Or not
 //*8. Backend completed verification that time, it return frontend response to frontend that verification .
+//*so first we will create a route for premium page in the frontend,we will create using some user cards for buying premium feature, then we will go to razorpay doc page. here:-https://razorpay.com/docs/payments/server-integration/nodejs/
+
+//* here they mentioned we have to first install razorpay package in the backend using command - npm i razorpay
+//* then backend , we will create a payment.js route in  routes folder and create create a route and export it.and then create a api named /payment/create post api.
+
 //! ⁢Season 3 - Episode - 8 - Building Real-time Live Chat Feature
 //* season 3 other episodes are about hosting the backend and frontend  , sending emails using aws ses,payment gateway integration with razorpay, so we will host in another place as aws want credit card details, and razorpay need to  verify kyc , so we will build the live chat feature using socket.io .
 //*What Socket.IO is
