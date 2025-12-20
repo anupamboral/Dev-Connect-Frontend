@@ -1230,6 +1230,7 @@ const UserCard = (props) => {
 };
 */
 //! ⁢Season 3 - Episode - 7 - Payment gateway integration
+//* this lesson is also written in the backend allLessonNotes.js file.
 //* we will create a premium purchase feature where will integrate  razorpay to get the payments,, so mainly there are two steps one is creating the order, second is payment verification.
 //* so every thing does not happen from the frontend , there is a secret key in the backend using which every thing happens.
 //*then we will go to razorpay and sign up and provide the kyc details to verify, it is safe to provide.
@@ -1245,6 +1246,323 @@ const UserCard = (props) => {
 
 //* here they mentioned we have to first install razorpay package in the backend using command - npm i razorpay
 //* then backend , we will create a payment.js route in  routes folder and create create a route and export it.and then create a api named /payment/create post api.
+//*then we will go to razorpay doc page. here:-https://razorpay.com/docs/payments/server-integration/nodejs/
+
+//* here they mentioned we have to first install razorpay package in the backend using command - npm i razorpay
+//* we will create a payment.js route in side routes folder and create create a route and export it.and then create a api named /payment/create post api.
+//* the here in this page they page integration steps:-https://razorpay.com/docs/payments/server-integration/nodejs/integration-steps/
+//*1. Instantiate Razorpay :- inside the utils folder we will create a razorpay .js config file, and there we will write this code:-
+/*const instance= require("razorpay")
+var instance = new Razorpay({
+  key_id: 'YOUR_KEY_ID',
+  key_secret: 'YOUR_KEY_SECRET',
+});
+module.exports = instance;
+*/
+//* we get the keys from accounts and setting in razorpay
+//* now we will go to payment.js import this instance and then create an order inside the api, and save that to database and send the response to ui, ,so to save the order in db we created a a schema inside model/payments.js like below:-
+
+/*const mongoose = require("mongoose");
+
+const paymentSchema = new mongoose.Schema(
+  {
+    orderId: {
+      type: String,
+      required: true,
+      unique: true,
+    },
+    amount: {
+      type: Number,
+      required: true,
+    },
+    currency: {
+      type: String,
+      default: "INR",
+    },
+    receipt: {
+      type: String,
+      required: true,
+    },
+    status: {
+      type: String,
+      required: true,
+    },
+    userId: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "User",
+      required: true,
+    },
+
+    paymentId: {
+      type: String,
+      sparse: true,
+    },
+
+    notes: {
+      firstName: {
+        type: String,
+      },
+      lastName: {
+        type: String,
+      },
+      membershipType: {
+        type: String,
+      },
+    },
+  },
+  { timestamps: true }
+);
+
+module.exports = mongoose.model("Payment", paymentSchema);
+*/
+//* and the payment api will look like below in routes/payments.js
+/*const express = require("express");
+const razorpayInstance = require("../utils/razorpay");
+const paymentRouter = express.Router();
+const Payment = require("../models/payment");
+const { userAuth } = require("../middlewares/auth");
+
+paymentRouter.post("/payment/create", userAuth, async (req, res) => {
+  try {
+    const { membershipType } = req.body;
+    const { firstName, lastName, emailId } = req.user;
+    //*creating an order
+    const order = await razorpayInstance.orders.create({
+      amount: membershipAmounts[membershipType], //* amount in the smallest currency unit/* this is coming from constants.js file, depending on what membership user chosen in frontend
+      currency: "INR",
+      receipt: "receipt#1",
+      notes: {
+        firstName: firstName,
+        lastName: lastName,
+        emailId: emailId,
+        membershipType: membershipType,
+      },
+    });
+    //*save it in my database
+    const payment = new Payment({
+      userId: req.user._id,
+      orderId: order.id,
+      amount: order.amount,
+      currency: order.currency,
+      receipt: order.receipt,
+      status: order.status,
+      notes: order.notes,
+    });
+    const savedPayment = await payment.save();
+    //*send order details to frontend
+    res.json({
+      ...savedPayment.toJSON(),
+    });
+  } catch (err) {
+    res.status(400).json({ message: "something went wrong:-" + err.message });
+  }
+});
+module.exports = paymentRouter;
+*/
+//* in the frontend in premium.jsx we will create a handleBuyClick click function and call on buy gold or silver btn click like below:-
+/*  const handleBuyClick = async (plan) => {
+    const order = await axios.post(
+      BASE_URL + "/payment/create",
+      { membershipType: plan },
+      { withCredentials: true }
+    );
+    console.log(order);
+  }*/
+/*      <button
+                onClick={() => {
+*                  handleBuyClick("silver");
+                }}
+                className="btn btn-primary btn-block"      Buy silver
+              </button>
+              >*/
+
+/*
+<button
+                onClick={() => {
+*                  handleBuyClick("gold");
+                }}
+                className="btn btn-secondary btn-block"
+              >
+                Buy Gold
+              </button>*/
+
+//* in the frontend index.html we have to add this script
+//*  <script src="https://checkout.razorpay.com/v1/checkout.js"></script>,this will access to the razorpay object using window.Razorpay that we will need after some time,
+//* then in the frontend handleBuyClick function after getting the order from backend we will call the razorpay checkout method to open the razorpay payment window like below:-const handleBuyClick = async (plan) => {
+/*
+  const handleBuyClick = async (plan) => {
+    const order = await axios.post(
+      BASE_URL + "/payment/create",
+      { membershipType: plan },
+      { withCredentials: true }
+    );
+    console.log(order);
+
+    //* opening payment diallage box 
+    const { amount, currency, keyId, notes, orderId } = order.data;
+    const options = {
+      key: keyId, // Replace with your Razorpay key_id
+      amount: amount, // Amount is in currency subunits.
+      currency: currency,
+      name: "Dev Connect",
+      description: "Test Transaction",
+      order_id: orderId, // This is the order_id created in the backend
+      prefill: {
+        name: notes.firstName + " " + notes.lastName,
+        email: notes.emailId,
+      },
+      theme: {
+        color: "#0000cc",
+      },
+    };
+
+    const rzp = new window.Razorpay(options);
+    rzp.open();
+  };
+*/
+//* now we can test the feature of opening the dialog box;
+
+//! payment verification using webhook
+//* to verify the payment we will use webhook feature of razorpay, so whenever a payment is done successfully, razorpay will send a post request to our webhook url with the payment details.
+//*what is webhook:- A webhook is a way for an application to provide other applications with real-time information. A webhook delivers data to other applications as it happens, meaning you get data immediately. Unlike typical APIs where you would need to poll for data very frequently in order to get it real-time. So basically whenever a payment is done successfully razorpay will send a post request to our webhook url with the payment details, then we can verify the payment using the signature sent by razorpay in the headers of the request using crypto module of nodejs.
+
+//* so first we will create a webhook url inside razorpay dashboard, to do that  we have to go to the - Razorpay Dashboard > Settings > Webhooks > Add New Webhook. So here we will add our webhook url like :- http://yourbackenddomain.com/payment/webhook (for local testing we can use ngrok to create a public url for our localhost) , and add a password and select payment failed & payment capture option and click on create webhook. so whenever there will be successful transaction this webhook will be called by razorpay with payment details.
+//* so to use this webhook we will go to razorpay doc :- https://razorpay.com/docs/webhooks/validate-test/#validate-webhooks
+//* click on node js option so we will see the sample code and we will copy it and use it to build our webhook api,
+//*we will come to the backend and open routes/payments.js file and create a post api named same as the route we used while creating the webhook,and we will not mention userAuth in this api because this will be called by razorpay server not by the user .
+//* as we can't see the webhook req.body in localhost without ngrok , so we to see how the request body will look like we can use go to this razorpay link and see the sample payload:- https://razorpay.com/docs/webhooks/payments/#payment-authorised
+//* so our api will look like below:-
+/*
+paymentRouter.post("/payment/webhook", async (req, res) => {
+  try {
+    const webhookSignature = req.headers["x-razorpay-signature"]; //* getting the signature sent by razorpay in headers
+
+    //* below function validateWebhookSignature will return true or false
+    const isWebhookValid = validateWebhookSignature(
+      JSON.stringify(req.body),
+      webhookSignature,
+      process.env.RAZORPAY_WEBHOOK_SECRET
+    ); //*first param webhook body, will sent by razorpay in req.body , second param is signature sent by razorpay in headers, third param is our secret key which we have set in env file. if someone tries to send some malicious information to our webhook endpoint then this validateWebhookSignature
+
+    //* if webhook is not valid then we will return 400 status code
+    if (!isWebhookValid) {
+      return res.status(400).json({ message: "Invalid webhook signature" });
+    }
+    //!updating the payment status in our database
+    const paymentDetails = req.body.payload.payment.entity; //* getting payment details from webhook payload.we can see the how req.body looks like in razorpay doc :- https://razorpay.com/docs/webhooks/payments/#payment-authorised
+    const payment = await Payment.findOne({ orderId: paymentDetails.order_id }); //* finding the payment in our database using orderId.
+    if (payment) {
+      //* if payment found then we will update the payment status in our database.
+      payment.status = paymentDetails.status; //* updating the payment status
+      await payment.save(); //* saving the updated payment
+    }
+
+    //* updating the user as premium user
+    if (paymentDetails.status === "captured") {
+      const user = await User.findOne({ _id: payment.userId });
+      user.isPremiumUser = true;
+      user.membershipType = payment.notes.membershipType;
+      await user.save();
+    }
+
+    //* sending 200 status code to razorpay to acknowledge that we have received the webhook (important step otherwise razorpay will keep sending the webhook again and again)
+    res.status(200).json({ message: "Webhook received successfully" });
+  } catch (err) {
+    res.status(400).json({ message: "something went wrong:-" + err.message });
+  }
+});
+*/
+//*---------------------------------------
+//* after updating the the database , we will now also have to mark the user as premium user, so we will go to user model and add a new field named isPremiumUser with default value false and memberShipType field with no default value in the User Schema
+/*
+    isPremiumUser: {
+      type: Boolean,
+      default: false,
+    },
+    membershipType: {
+      type: String,
+    },
+    */
+//* and then only we can update the user and call the api.
+
+//*-----------------
+//! now after updating the payments details and user details in the database and sending back the response to razorpay server with status 200 we will create a api to verify the membership status of the loggedInUser,WE WILL CALL THIS FROM THE FRONTEND.like below:-
+/*paymentRouter.get("/premium/verify", userAuth, async (req, res) => {
+  try {
+    const user = req.user.toJson(); //* toJson() method will give plain js object
+    //* check if the user is premium user and send the response to frontend
+    if (user.isPremiumUser) {
+      return res.json({
+        isPremiumUser: true,
+        membershipType: user.membershipType,
+      });
+    }
+  } catch (err) {
+    res.status(400).json({ message: "something went wrong:-" + err.message });
+  }
+});
+*/
+//* in the frontend , now we now we will premium.jsx and write verifyPremiumUser  function like below:-
+/*
+  const verifyPremiumUser = async () => {
+    try {
+      const res = await axios.get(BASE_URL + "/payment/verify", {
+        withCredentials: true,
+      });
+
+      if (res.data.isPremium) {
+        setIsPremiumUser(true);
+        setPremiumStatus(res.data.membershipType);
+      }
+    } catch (error) {
+      console.error("Error verifying premium user:", error);
+    }
+  };*/
+//* and inside the handlebuyclick function which we already created, after opening the razorpay dialog box we will call this verifyPremiumUser function to update the premium status of the user in the frontend after successful payment , so in the options we will just mention the handler:verifyPayment function like below. and it will be automatically called.  like below:-
+/*
+  const handleBuyClick = async (plan) => {
+    const order = await axios.post(
+      BASE_URL + "/payment/create",
+      { membershipType: plan },
+      { withCredentials: true }
+    );
+    console.log(order);
+
+    //* opening payment diallage box
+    const { amount, currency, keyId, notes, orderId } = order.data;
+    const options = {
+      key: keyId, // Replace with your Razorpay key_id
+      amount: amount, // Amount is in currency subunits.
+      currency: currency,
+      name: "Dev Connect",
+      description: "Test Transaction",
+      order_id: orderId, // This is the order_id created in the backend
+      prefill: {
+        name: notes.firstName + " " + notes.lastName,
+        email: notes.emailId,
+      },
+      theme: {
+        color: "#0000cc",
+      },
+!      handler: verifyPremiumUser,//* this will be automatically called after payment is verified
+    };
+
+    const rzp = new window.Razorpay(options);
+    rzp.open();
+  };
+*/
+//* and inside the verifypayment function when as we got the response if the user premium, we created a state variable named isPremiumUser and set it to true and also set the membershipType state variable to the membershipType received from backend.like below:-
+/*
+      if (res.data.isPremium) {
+        setIsPremiumUser(true);
+        setPremiumStatus(res.data.membershipType);
+      }
+      */
+//* and depending the value of this isPremiumUser state variable we will show premium badge profile page of the user. and also if the user goes to premium section then also he will see that he is a premium user.
+//* and in the premium.jsx page we will also write a useEffect to call this verifyPremiumUser function when the component is mounted for first time so whenever the user is again opening the website later some time this useEffect will be called and it will fetch the premium status i th user is already a premium user  ,  like below:-
+// useEffect(() => {
+//   verifyPremiumUser();
+// }, []); //* to run only once on component mount and load the premium status
 
 //! ⁢Season 3 - Episode - 8 - Building Real-time Live Chat Feature
 //* season 3 other episodes are about hosting the backend and frontend  , sending emails using aws ses,payment gateway integration with razorpay, so we will host in another place as aws want credit card details, and razorpay need to  verify kyc , so we will build the live chat feature using socket.io .

@@ -89,11 +89,19 @@ const Requests = () => {
                       />
                     </div>
                     <div className="flex flex-col  ">
-                      <h2 className="self-center md:self-start  card-title">
-                        {request.fromUserId.firstName +
-                          " " +
-                          request.fromUserId.lastName}
-                      </h2>
+                      <div className="flex justify-start">
+                        <h2 className="self-center md:self-start  card-title">
+                          {request.fromUserId.firstName +
+                            " " +
+                            request.fromUserId.lastName}
+                        </h2>
+                        {request.fromUserId.isPremiumUser && (
+                          <button className="btn btn-dash btn-info ml-2 -mt-3">
+                            🗸
+                          </button>
+                        )}
+                      </div>
+
                       {request.fromUserId.age && request.fromUserId.gender && (
                         <p className="text-xs uppercase font-semibold opacity-60">{`Age: ${request.fromUserId.age} , ${request.fromUserId.gender}`}</p>
                       )}

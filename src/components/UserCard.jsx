@@ -18,6 +18,7 @@ const UserCard = (props) => {
     gender,
     emailId,
     _id,
+    isPremiumUser,
   } = props.feed;
 
   const { buttonDisplay, emailDisplay } = props;
@@ -54,7 +55,13 @@ const UserCard = (props) => {
         <img className="h-72 w-92" src={photoUrl} alt="Shoes" />
       </figure>
       <div className="card-body p-4">
-        <h2 className="card-title">{firstName + " " + lastName}</h2>
+        <div className="flex justify-between">
+          <h2 className="card-title">{firstName + " " + lastName}</h2>
+          {isPremiumUser && (
+            <button className="btn btn-outline btn-info">🗸</button>
+          )}
+        </div>
+
         {emailDisplay && <p className="text-white">Email id:- {emailId}</p>}
         {age && gender && (
           <p className="text-xs uppercase font-semibold opacity-60">{`Age: ${age} , ${gender}`}</p>
