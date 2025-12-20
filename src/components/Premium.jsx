@@ -12,10 +12,10 @@ const Premium = () => {
 
   const verifyPremiumUser = async () => {
     try {
-      const res = await axios.get(BASE_URL + "/payment/verify", {
+      const res = await axios.get(BASE_URL + "/premium/verify", {
         withCredentials: true,
       });
-
+      console.log(res.data);
       if (res.data.isPremium) {
         setIsPremiumUser(true);
         setPremiumStatus(res.data.membershipType);
@@ -44,6 +44,7 @@ const Premium = () => {
       prefill: {
         name: notes.firstName + " " + notes.lastName,
         email: notes.emailId,
+        contact: 9999999999, //* for testing
       },
       theme: {
         color: "#0000cc",
