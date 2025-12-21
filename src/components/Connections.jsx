@@ -10,6 +10,7 @@ const Connections = () => {
   const navigate = useNavigate();
   const dispatch = useDispatch();
   const connections = useSelector((store) => store.connections);
+  console.log(connections);
   const fetchConnection = async () => {
     try {
       const res = await axios.get(BASE_URL + "/user/connections", {
@@ -65,9 +66,20 @@ const Connections = () => {
                     />
                   </div>
                   <div className="flex flex-col  justify-start">
-                    <h2 className="self-center md:self-start  card-title">
-                      {connection.firstName + " " + connection.lastName}
-                    </h2>
+                    <div className="flex justify-start">
+                      <h2 className="self-center md:self-start  card-title">
+                        {connection.firstName + " " + connection.lastName}
+                      </h2>
+
+                      {connection.isPremiumUser && (
+                        <button
+                          title="Premium user"
+                          className="btn btn-dash btn-info ml-4 p-2 -mt-3"
+                        >
+                          🗸
+                        </button>
+                      )}
+                    </div>
                     {connection?.age && connection?.gender && (
                       <p>{`Age: ${connection?.age} , ${connection?.gender}`}</p>
                     )}

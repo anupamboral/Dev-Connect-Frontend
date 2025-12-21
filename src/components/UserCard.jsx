@@ -7,6 +7,7 @@ import { BASE_URL } from "../utils/constants";
 const UserCard = (props) => {
   const navigate = useNavigate();
   const dispatch = useDispatch();
+
   console.log(props.feed);
   const {
     firstName,
@@ -58,7 +59,9 @@ const UserCard = (props) => {
         <div className="flex justify-between">
           <h2 className="card-title">{firstName + " " + lastName}</h2>
           {isPremiumUser && (
-            <button className="btn btn-outline btn-info">🗸</button>
+            <button title="Premium user" className="btn btn-outline btn-info">
+              🗸
+            </button>
           )}
         </div>
 

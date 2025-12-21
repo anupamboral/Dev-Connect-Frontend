@@ -1,12 +1,12 @@
 import { useState } from "react";
-import { useDispatch } from "react-redux";
-import { useNavigate } from "react-router-dom";
+import { useDispatch, useSelector } from "react-redux";
 import UserCard from "./UserCard";
 import axios from "axios";
 import { BASE_URL } from "../utils/constants";
 import { addUser } from "../utils/userSlice";
 
 const EditProfile = ({ user }) => {
+    const isPremiumUser = useSelector((store) => store.premium.isPremiumUser); //* to fetch premium user status from the store to display premium badge on user card
   console.log(user);
   const [error, setError] = useState("");
   //* importing dispatch function
@@ -154,6 +154,7 @@ const EditProfile = ({ user }) => {
               gender,
               photoUrl,
               emailId,
+              isPremiumUser
             }}
             buttonDisplay={false}
             emailDisplay={true}

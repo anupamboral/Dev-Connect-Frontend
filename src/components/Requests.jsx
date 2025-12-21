@@ -96,7 +96,7 @@ const Requests = () => {
                             request.fromUserId.lastName}
                         </h2>
                         {request.fromUserId.isPremiumUser && (
-                          <button className="btn btn-dash btn-info ml-2 -mt-3">
+                          <button className="btn btn-dash btn-info ml-4 p-2 -mt-3">
                             🗸
                           </button>
                         )}

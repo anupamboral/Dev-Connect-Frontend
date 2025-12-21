@@ -1,24 +1,31 @@
 /* eslint-disable react-hooks/immutability */
 import axios from "axios";
-import React, { useEffect, useState } from "react";
+import React, { useEffect } from "react";
 import { BASE_URL } from "../utils/constants";
+import { useDispatch, useSelector } from "react-redux";
+import { addPremiumStatus } from "../utils/premiumSlice";
 
 const Premium = () => {
-  const [isPremiumUser, setIsPremiumUser] = useState(false); //* to keep track if the user is premium or not
-  const [premiumStatus, setPremiumStatus] = useState(""); //* to show the type of premium membership
+  const isPremiumUser = useSelector((store) => store.premium.isPremiumUser); //*boolean to check if the user is premium or not
+  const premiumStatus = useSelector((store) => store.premium.membershipType); //*silver/gold (string) to get the type of premium membership the user has
+  // const [isPremiumUser, setIsPremiumUser] = useState(false); //* to keep track if the user is premium or not
+  // const [premiumStatus, setPremiumStatus] = useState(""); //* to show the type of premium membership
+  const dispatch = useDispatch();
   useEffect(() => {
     verifyPremiumUser();
   }, []); //* to run only once on component mount and load the premium status
 
   const verifyPremiumUser = async () => {
+    console.log("verifyUser called");
     try {
       const res = await axios.get(BASE_URL + "/premium/verify", {
         withCredentials: true,
       });
       console.log(res.data);
-      if (res.data.isPremium) {
-        setIsPremiumUser(true);
-        setPremiumStatus(res.data.membershipType);
+      if (res.data.isPremiumUser) {
+        dispatch(addPremiumStatus(res.data)); //* instead of setting local state, dispatching action to update redux store, so when the user goes to another page of our website and comes back to premium page again we don't have to make api call again to check if the user is premium or not, we can just get it from the store.
+        // setIsPremiumUser(true);
+        // setPremiumStatus(res.data.membershipType);
       }
     } catch (error) {
       console.error("Error verifying premium user:", error);

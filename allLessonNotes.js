@@ -1510,7 +1510,7 @@ paymentRouter.post("/payment/webhook", async (req, res) => {
         withCredentials: true,
       });
 
-      if (res.data.isPremium) {
+      if (res.data.isPremiumUser) {
         setIsPremiumUser(true);
         setPremiumStatus(res.data.membershipType);
       }

@@ -3,6 +3,8 @@ import userSlice from "./userSlice";
 import feedSlice from "./feedSlice";
 import connectionsSlice from "./connectionsSlice";
 import requestsSlice from "./requestsSlice";
+import premiumSlice from "./premiumSlice";
+
 //* creating the store
 const appStore = configureStore({
   reducer: {
@@ -10,6 +12,7 @@ const appStore = configureStore({
     feed: feedSlice,
     connections: connectionsSlice,
     requests: requestsSlice,
+    premium: premiumSlice,
   },
 });
 export default appStore;
