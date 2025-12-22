@@ -1,6 +1,5 @@
-/* eslint-disable react-hooks/immutability */
 import axios from "axios";
-import React, { useEffect } from "react";
+import { useEffect } from "react";
 import { BASE_URL } from "../utils/constants";
 import { useDispatch, useSelector } from "react-redux";
 import { addPremiumStatus } from "../utils/premiumSlice";
@@ -13,6 +12,7 @@ const Premium = () => {
   const dispatch = useDispatch();
   useEffect(() => {
     verifyPremiumUser();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []); //* to run only once on component mount and load the premium status
 
   const verifyPremiumUser = async () => {
@@ -113,22 +113,25 @@ const Premium = () => {
                     : "100 connection requests per day"}
                 </span>
               </li>
-              <li>
+              <li className="flex -ml-0.5">
                 <svg
                   xmlns="http://www.w3.org/2000/svg"
-                  className="size-4 me-2 inline-block text-success"
-                  fill="none"
-                  viewBox="0 0 24 24"
-                  stroke="currentColor"
+                  x="0px"
+                  y="0px"
+                  width="24"
+                  height="24"
+                  viewBox="0 0 48 48"
                 >
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    strokeWidth="2"
-                    d="M5 13l4 4L19 7"
-                  />
+                  <polygon
+                    fill="#42a5f5"
+                    points="29.62,3 33.053,8.308 39.367,8.624 39.686,14.937 44.997,18.367 42.116,23.995 45,29.62 39.692,33.053 39.376,39.367 33.063,39.686 29.633,44.997 24.005,42.116 18.38,45 14.947,39.692 8.633,39.376 8.314,33.063 3.003,29.633 5.884,24.005 3,18.38 8.308,14.947 8.624,8.633 14.937,8.314 18.367,3.003 23.995,5.884"
+                  ></polygon>
+                  <polygon
+                    fill="#fff"
+                    points="21.396,31.255 14.899,24.76 17.021,22.639 21.428,27.046 30.996,17.772 33.084,19.926"
+                  ></polygon>
                 </svg>
-                <span>Blue Tick</span>
+                <span className="mt-0.5 ml-1">Blue Tick</span>
               </li>
               <li>
                 <svg
@@ -199,22 +202,25 @@ const Premium = () => {
                 </svg>
                 <span>100 connection requests per day</span>
               </li>
-              <li>
+              <li className="flex -ml-0.5">
                 <svg
                   xmlns="http://www.w3.org/2000/svg"
-                  className="size-4 me-2 inline-block text-success"
-                  fill="none"
-                  viewBox="0 0 24 24"
-                  stroke="currentColor"
+                  x="0px"
+                  y="0px"
+                  width="24"
+                  height="24"
+                  viewBox="0 0 48 48"
                 >
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    strokeWidth="2"
-                    d="M5 13l4 4L19 7"
-                  />
+                  <polygon
+                    fill="#42a5f5"
+                    points="29.62,3 33.053,8.308 39.367,8.624 39.686,14.937 44.997,18.367 42.116,23.995 45,29.62 39.692,33.053 39.376,39.367 33.063,39.686 29.633,44.997 24.005,42.116 18.38,45 14.947,39.692 8.633,39.376 8.314,33.063 3.003,29.633 5.884,24.005 3,18.38 8.308,14.947 8.624,8.633 14.937,8.314 18.367,3.003 23.995,5.884"
+                  ></polygon>
+                  <polygon
+                    fill="#fff"
+                    points="21.396,31.255 14.899,24.76 17.021,22.639 21.428,27.046 30.996,17.772 33.084,19.926"
+                  ></polygon>
                 </svg>
-                <span>Blue Tick</span>
+                <span className="mt-0.5 ml-1">Blue Tick</span>
               </li>
               <li>
                 <svg
@@ -288,22 +294,25 @@ const Premium = () => {
                 </svg>
                 <span>Infinite connection requests per day</span>
               </li>
-              <li>
+              <li className="flex -ml-0.5">
                 <svg
                   xmlns="http://www.w3.org/2000/svg"
-                  className="size-4 me-2 inline-block text-success"
-                  fill="none"
-                  viewBox="0 0 24 24"
-                  stroke="currentColor"
+                  x="0px"
+                  y="0px"
+                  width="24"
+                  height="24"
+                  viewBox="0 0 48 48"
                 >
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    strokeWidth="2"
-                    d="M5 13l4 4L19 7"
-                  />
+                  <polygon
+                    fill="#42a5f5"
+                    points="29.62,3 33.053,8.308 39.367,8.624 39.686,14.937 44.997,18.367 42.116,23.995 45,29.62 39.692,33.053 39.376,39.367 33.063,39.686 29.633,44.997 24.005,42.116 18.38,45 14.947,39.692 8.633,39.376 8.314,33.063 3.003,29.633 5.884,24.005 3,18.38 8.308,14.947 8.624,8.633 14.937,8.314 18.367,3.003 23.995,5.884"
+                  ></polygon>
+                  <polygon
+                    fill="#fff"
+                    points="21.396,31.255 14.899,24.76 17.021,22.639 21.428,27.046 30.996,17.772 33.084,19.926"
+                  ></polygon>
                 </svg>
-                <span>Blue Tick</span>
+                <span className="mt-0.5 ml-1">Blue Tick</span>
               </li>
               <li>
                 <svg

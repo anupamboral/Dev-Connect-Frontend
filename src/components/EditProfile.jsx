@@ -6,7 +6,8 @@ import { BASE_URL } from "../utils/constants";
 import { addUser } from "../utils/userSlice";
 
 const EditProfile = ({ user }) => {
-    const isPremiumUser = useSelector((store) => store.premium.isPremiumUser); //* to fetch premium user status from the store to display premium badge on user card
+  const isPremiumUser = useSelector((store) => store.premium.isPremiumUser); //* to fetch premium user status from the store to display premium badge on user card
+
   console.log(user);
   const [error, setError] = useState("");
   //* importing dispatch function
@@ -51,7 +52,7 @@ const EditProfile = ({ user }) => {
     }
   };
   return (
-    <div className="mb-4">
+    <div className="mb-20">
       <div className="lg:flex lg:flex-row  items-start md:flex-col-reverse  justify-center lg:grow-0 mt-4  ">
         <div className="edit-profile flex justify-center lg:mr-6 mb-6">
           <div className="card bg-base-300 w-96 shadow-sm flex justify-center">
@@ -154,7 +155,7 @@ const EditProfile = ({ user }) => {
               gender,
               photoUrl,
               emailId,
-              isPremiumUser
+              isPremiumUser,
             }}
             buttonDisplay={false}
             emailDisplay={true}
