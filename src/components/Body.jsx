@@ -6,6 +6,7 @@ import { BASE_URL } from "../utils/constants";
 import { useDispatch } from "react-redux";
 import { addUser } from "../utils/userSlice";
 import { useEffect } from "react";
+import { addPremiumStatus } from "../utils/premiumSlice";
 
 function Body() {
   const navigate = useNavigate();
@@ -16,8 +17,18 @@ function Body() {
       const res = await axios.get(BASE_URL + "/profile/view", {
         withCredentials: true,
       });
+      console.log(res.data);
       //* saving data in to userSlice(redux stare)
       dispatch(addUser(res.data));
+      //* if the user is premium then , when we are fetching the feed data in in the first load immediately from here also we will update the premium status
+      res.data.data.isPremiumUser
+        ? dispatch(
+            addPremiumStatus({
+              isPremiumUser: res.data.data.isPremiumUser,
+              membershipType: res.data.data.membershipType,
+            })
+          )
+        : null;
     } catch (err) {
       if (err.status === 401) {
         console.log(err);

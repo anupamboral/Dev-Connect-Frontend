@@ -1551,7 +1551,7 @@ paymentRouter.post("/payment/webhook", async (req, res) => {
     rzp.open();
   };
 */
-//* and inside the verifypayment function when as we got the response if the user premium, we created a state variable named isPremiumUser and set it to true and also set the membershipType state variable to the membershipType received from backend.like below:-
+//* and inside the verifyPayment function when as we got the response if the user premium, we created a state variable named isPremiumUser and set it to true and also set the membershipType state variable to the membershipType received from backend.like below:-
 /*
       if (res.data.isPremium) {
         setIsPremiumUser(true);
@@ -1563,7 +1563,7 @@ paymentRouter.post("/payment/webhook", async (req, res) => {
 // useEffect(() => {
 //   verifyPremiumUser();
 // }, []); //* to run only once on component mount and load the premium status
-
+//* but as we implemented , the verified tick for premium user, so let's say the user is opening the website after some days, ,so in his profile section and in the nav bar, if the user is premium user already then before even opening the premium page we want still want to show the , premium badge, so in the nav bar component we subscribed both the user slice and the premium slice, so either the user just activating the subscription or already a premium user and and coming after some time in both cases the badge gets displayed, and in the edit profile section we only subscribed to premium slice, because when we first activating the subscription then only premium slice updates , so to display the badge in navbar adding both slices is required, but in editProfile section that is not required.
 //! ⁢Season 3 - Episode - 8 - Building Real-time Live Chat Feature
 //* season 3 other episodes are about hosting the backend and frontend  , sending emails using aws ses,payment gateway integration with razorpay, so we will host in another place as aws want credit card details, and razorpay need to  verify kyc , so we will build the live chat feature using socket.io .
 //*What Socket.IO is

@@ -59,7 +59,7 @@ const UserCard = (props) => {
         <div className="flex justify-between">
           <h2 className="card-title">{firstName + " " + lastName}</h2>
           {isPremiumUser && (
-            <span title="Premium user" className=" bg-base-300 ">
+            <span title="Premium user" className=" bg-base-300">
               <svg
                 xmlns="http://www.w3.org/2000/svg"
                 x="0px"

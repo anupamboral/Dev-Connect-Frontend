@@ -5,7 +5,6 @@ import { useDispatch, useSelector } from "react-redux";
 import { addFeed } from "../utils/feedSlice";
 import { useNavigate } from "react-router-dom";
 import UserCard from "./UserCard";
-import { addPremiumStatus } from "../utils/premiumSlice";
 
 const Feed = () => {
   const dispatch = useDispatch();
@@ -23,15 +22,6 @@ const Feed = () => {
       res.data.data.length === 0
         ? dispatch(addFeed(null))
         : dispatch(addFeed(res.data.data));
-      //* if the user is premium then , when we are fetching the feed data in in the first load immediately from here also we will update the premium status
-      res.data.data.isPremiumUser
-        ? dispatch(
-            addPremiumStatus({
-              isPremiumUser: res.data.data.isPremiumUser,
-              membershipType: res.data.data.membershipType,
-            })
-          )
-        : null;
     } catch (err) {
       console.error(err);
       navigate("/error", {
