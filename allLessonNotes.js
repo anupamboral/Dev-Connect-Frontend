@@ -1565,11 +1565,70 @@ paymentRouter.post("/payment/webhook", async (req, res) => {
 // }, []); //* to run only once on component mount and load the premium status
 //* but as we implemented , the verified tick for premium user, so let's say the user is opening the website after some days, ,so in his profile section and in the nav bar, if the user is premium user already then before even opening the premium page we want still want to show the , premium badge, so in the nav bar component we subscribed both the user slice and the premium slice, so either the user just activating the subscription or already a premium user and and coming after some time in both cases the badge gets displayed, and in the edit profile section we only subscribed to premium slice, because when we first activating the subscription then only premium slice updates , so to display the badge in navbar adding both slices is required, but in editProfile section that is not required.
 //! ⁢Season 3 - Episode - 8 - Building Real-time Live Chat Feature
-//* season 3 other episodes are about hosting the backend and frontend  , sending emails using aws ses,payment gateway integration with razorpay, so we will host in another place as aws want credit card details, and razorpay need to  verify kyc , so we will build the live chat feature using socket.io .
-//*What Socket.IO is
+//* season 3 other episodes are about hosting the backend and frontend  , sending emails using aws ses,payment gateway integration with razorpay, so we will host in another place as aws want credit card details, and razorpay we have integrated , so we will build the live chat feature using socket.io .
+//*What is Socket.IO ?
 //*Socket.IO is a library that enables low-latency, bidirectional and event-based communication between a client and a server.
 //* remember these three words ,it enables low latency, bidirectional, event based communication.
 //* low latency means the connection is fast,
 //* Bidirectional sockets allow data to flow both ways (send/receive) over a single connection, ideal for real-time interaction (like chats, WebSockets), while unidirectional sockets permit data flow in only one direction, used for simpler tasks like monitoring or logging where one side sends data and the other just listens.
 //*Event-based communication in socket connections means it uses an event-driven model where the client and server exchange named events (like 'userTyping', 'messageReceived') over an open, persistent connection (often WebSockets) instead of traditional request/response, allowing for real-time, low-latency, bidirectional data flow, ideal for chat apps or collaborative tools. It relies on an event loop: waiting for events, executing handlers (like socket.on('event', handler)), and emitting new events (like socket.emit('event', data)).
+//* in the connections page of frontend, we will build a chat feature so, we will need a separate component for that, so first we will create a chat component, add the route link of the chat component in the app.js file as /chat:targetUserId ,here targetUserId will be dynamic,for each user so we can mark with which user the logged in user is chatting so the targetUserId is the id of user we will chat, let's say we want to chat with mark zukerberg to so in that case targetUserId will be the userId of mark, , in the connections page , for every user , we will add a chat btn, which will take us to the chat page and we will send the user's id dynamically,like below:-
+/* <Link to={"/chat/" + connection._id}>
+                    <button className="btn btn-secondary" type="button">
+                      Chat
+                    </button>
+                  </Link>
+*/
+//* then in the chat component , we will receive this userId using the useParams hook
+//*  const targetUserId = useParams(); //* to gets access to the params sent through the url path,
+//* websocket is connection between server and client so it's bidirectional connection and that's why socket.io gives us two kind of docs one for client and one for server , so one is server api and one client api.
+//* in backend
+//* first we will write code for backend, so we will require the http module already available on node in app.js
+//* for socket io connection requiring http module
+//! const http = require("http");
+//* then before app.listen() we will create a server using http module
+//* creating a server for socket io connection using the http.createServer() and passing the express app into it.
+//! const server = http.createServer(app); //* after creating it instead of app.listen() now we will can server.listen(),
+//* then we will create a server.js file inside utils folder , and initialize socket inside socket.js like below:-
+
+//*initializing the the socket
+/*
+const initializeSocket = (server) => {
+  //* initializing the socket connection by passing the server and cors configuration
+  const io = socket(server, {
+    cors: {
+      origin: "http://localhost:5173"
+    }
+  });
+  //* listening for the socket requests
+  io.on("connection", (socket) => {
+    //*handling events
+    socket.on("joinChat", () => {
+      
+    });
+    socket.on("sendMessage", () => {
+      
+    });
+    socket.on("disconnect", () => {
+      
+    })
+  })
+};*/
+//* exporting this function
+//* module.exports = initializeSocket
+
+//* then we will comeback to app.js and import the initializeSocket function and  after where we created server using httpCreateServer, we will call this initializeSocket function and pass the server as argument like below:-
+//!initializeSocket(server); //* after creating this initializeSocket function inside utils/sockets.js we imported in app.js and called it with passing the server as argument.
+
+//* then instead of app.listen() using server.listen()
+/*
+!server.listen(port, () => {
+  console.log("server is listening successfully on port 3000");
+}); *///! as we created socket io connection we provided app(express app) into http.createServer(app), then only instead of app.listen() we can write server.listen(), if we don't need socket io connection then we can still write app.listen , it will still work but socket will not work.
+
+//* this is the configuration we need for socket, so the server we created using http.createServer(app),
+
+
+
+
 //! for production upload, change the constants url to actual one, before making the dist folder

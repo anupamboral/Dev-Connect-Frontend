@@ -2,7 +2,7 @@ import { useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
 
 import { BASE_URL } from "../utils/constants";
-import { useNavigate } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { addConnections } from "../utils/connectionsSlice";
 import axios from "axios";
 
@@ -16,7 +16,7 @@ const Connections = () => {
       const res = await axios.get(BASE_URL + "/user/connections", {
         withCredentials: true,
       });
-
+      console.log(res);
       dispatch(addConnections(res.data.data));
     } catch (err) {
       navigate("/error", {
@@ -53,14 +53,14 @@ const Connections = () => {
               key={crypto.randomUUID()}
               className="mb-4 lg:mx-24 bg-base-300 rounded-4xl mx-6"
             >
-              <div className="   rounded-4xl">
+              <div className="rounded-4xl">
                 <div
                   role="alert"
-                  className="    alert bg-base-300 alert-vertical sm:alert-horizontal"
+                  className="alert bg-base-300 alert-vertical sm:alert-horizontal"
                 >
                   <div className=" self-start">
                     <img
-                      className="  h-36 w-36 rounded-4xl"
+                      className="h-36 w-36 rounded-4xl"
                       src={connection.photoUrl}
                       alt="Shoes"
                     />
@@ -111,6 +111,11 @@ const Connections = () => {
                     )}
                     <p className="text-white">{connection.about}</p>
                   </div>
+                  <Link to={"/chat/" + connection._id}>
+                    <button className="btn btn-secondary" type="button">
+                      Chat
+                    </button>
+                  </Link>
                 </div>
               </div>
             </div>
