@@ -1624,11 +1624,48 @@ const initializeSocket = (server) => {
 /*
 !server.listen(port, () => {
   console.log("server is listening successfully on port 3000");
-}); *///! as we created socket io connection we provided app(express app) into http.createServer(app), then only instead of app.listen() we can write server.listen(), if we don't need socket io connection then we can still write app.listen , it will still work but socket will not work.
+}); */ //! as we created socket io connection we provided app(express app) into http.createServer(app), then only instead of app.listen() we can write server.listen(), if we don't need socket io connection then we can still write app.listen , it will still work but socket will not work.
 
 //* this is the configuration we need for socket, so the server we created using http.createServer(app),
 
+//* ------------------frontend
+//* now we have to back to the frontend and install the frontend socket io package in frontend , using the npm install socket.io-client
+//*then documentation we can go to client api option, beside server api. so as mentioned in doc, we will come back to the frontend then inside utils folder we will create a socket.js file and then we will import it , and create a socket connection like below:-
+//* import { io } from "socket.io-client";
+//*import { BASE_URL } from "./constants";
 
+/*export const createSocketConnection = () => {
+  return io(BASE_URL)
+};*/
+//* then comeback to the chat.js file and write a useEffect with  dependency array where we will mention userId and targetUserId so whenever any of this changes this useEffect gets called and then import the createSocketConnect and then call it inside the useEffect then save its value into a socket constant then, below it we will emit and event . so the event name should be same as we written in the backend , so in the backend we written a event jointChat so we will call that event and and mention and targetUserId and the loggedInUser's id , and also write a clean up function to disconnect the connection when the user leaves the chat , so when the chat component gets unmounted,  like below:-
+/*
+const user = useSelector((store) => store.user);
+  const userId = user?._id; //* writing optional chaining is important here react, render every in multiple cycles that;s why as initially the value of user store will be empty so, if we don;t write optional chaining then it will through error
 
+  //* creating connection with backend and then emitting event to jointChat ans passing both targetUserid amd loggedinUserId,
+  useEffect(() => {
+    if (!userId) return; //* if the userId is not yet loaded do early retrun so it does not through any error
+    const socket = createSocketConnection();
+    //* as soon as the page loaded, the socket connection is made and join chat event is emitted
+    socket.emit("jointChat", { userId, targetUserId });
+
+    //* clean up function for disconnecting the socket connection when the component unmounts
+    return () => {
+      socket.disconnect();
+    };
+  }, [userId, targetUserId]);
+   */
+
+///**--------backend */
+//* in the backend we will go to the utils/socket.js inside joinChat event handler we will write code to create a separate room to having the chat between two users like below:
+/*
+    socket.on("joinChat", ({ userId, targetUserId }) => {
+      //* like two have a conversation between two people there should separate room , similarly we need to create separate roomId to chat using socket io, which should be unique, because we can't mix, other people's conversation that's why we are getting the targetUserId and userId to create a separate roomId,
+
+      const roomId = [userId, targetUserId].join("_");
+      console.log("Room Id:" + roomId);
+      socket.join(roomId);
+    });
+    */
 
 //! for production upload, change the constants url to actual one, before making the dist folder

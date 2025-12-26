@@ -1,10 +1,34 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
+import { createSocketConnection } from "../utils/socket";
+import { useSelector } from "react-redux";
 
 const Chat = () => {
-  const targetUserId = useParams(); //* to gets access to the params sent through the url path
-  console.log(targetUserId);
+  const { targetUserId } = useParams(); //* to gets access to the params sent through the url path
+  // console.log(targetUserId);
   const [messages, setMessages] = useState([{ text: "Hello World" }]);
+  const user = useSelector((store) => store.user);
+  const userId = user?.data?._id; //* writing optional chaining is important here react, render every in multiple cycles that;s why as initially the value of user store will be empty so, if we don;t write optional chaining then it will through error
+  console.log(user);
+  console.log(userId);
+  //* creating connection with backend and then emitting event to jointChat ans passing both targetUserid amd loggedinUserId,
+  useEffect(() => {
+    if (!userId) return; //* if the userId is not yet loaded do early retrun so it does not through any error
+    console.log(userId, targetUserId);
+    const socket = createSocketConnection();
+
+    //* as soon as the page loaded, the socket connection is made and join chat event is emitted
+    socket.emit("joinChat", {
+      firstName: user.data.firstName,
+      userId,
+      targetUserId,
+    });
+    console.log(socket);
+    //* clean up function for disconnecting the socket connection when the component unmounts
+    return () => {
+      socket.disconnect();
+    };
+  }, [userId, targetUserId]);
   return (
     <div>
       <div className="p-2">
@@ -17,8 +41,8 @@ const Chat = () => {
           <div className="chat-message flex-1 overflow-scroll border-b-2 lg:h-[52dvh] h-[64dvh] border-amber-50 p-4 pl-2 m-2">
             {messages.map((message, index) => {
               return (
-                <div>
-                  <div key={index} className="chat chat-start">
+                <div key={index}>
+                  <div className="chat chat-start">
                     <div className="chat-image avatar">
                       <div className="w-10 rounded-full">
                         <img
