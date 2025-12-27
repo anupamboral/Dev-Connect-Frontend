@@ -1564,6 +1564,55 @@ paymentRouter.post("/payment/webhook", async (req, res) => {
 //   verifyPremiumUser();
 // }, []); //* to run only once on component mount and load the premium status
 //* but as we implemented , the verified tick for premium user, so let's say the user is opening the website after some days, ,so in his profile section and in the nav bar, if the user is premium user already then before even opening the premium page we want still want to show the , premium badge, so in the nav bar component we subscribed both the user slice and the premium slice, so either the user just activating the subscription or already a premium user and and coming after some time in both cases the badge gets displayed, and in the edit profile section we only subscribed to premium slice, because when we first activating the subscription then only premium slice updates , so to display the badge in navbar adding both slices is required, but in editProfile section that is not required.
+//!ScrollingToTop component
+//* when we were in the connection component then when we were scrolling to the middle portion to find any connection and open chat of that connection then while chat page was opening chat page also opening from the middle portion but we wanted that when the route change happen then the chat page should open from the top and not scrolled , so we added a scrollingToTop component inside components folder, and written below code:-
+/*
+import { useEffect } from 'react';
+import { useLocation } from 'react-router-dom';
+
+const ScrollToTop = () => {
+  const { pathname } = useLocation();
+
+  useEffect(() => {
+    window.scrollTo({
+      top: 0,
+      left: 0,
+      behavior: 'smooth' // Use 'instant' for no animation
+    });
+  }, [pathname]); // Re-run the effect when the pathname changes
+
+  return null; // This component doesn't render anything
+};
+
+export default ScrollToTop;
+*/
+//* then in app.jsx file we added this ScrollingTo top component and now it is working as expected, we written the ScrollToTop component in app.jsx like below:-
+/*
+function App() {
+  return (
+    <>
+      <Provider store={appStore}>
+        <BrowserRouter basename="/">
+!          <ScrollingToTop /> //* always we have to write it here above,<Routes></Routes> component
+          <Routes>
+            <Route path="/" element={<Body />}>
+              <Route path="/" element={<Feed />}></Route>
+              <Route path="/login" element={<Login />}></Route>
+              <Route path="/profile" element={<Profile />}></Route>
+              <Route path="/error" element={<Error />}></Route>
+              <Route path="/connections" element={<Connections />}></Route>
+              <Route path="/requests" element={<Requests />}></Route>
+              <Route path="/premium" element={<Premium />}></Route>
+              <Route path="/chat/:targetUserId" element={<Chat />}></Route>
+            </Route>
+          </Routes>
+        </BrowserRouter>
+      </Provider>
+    </>
+  );
+}
+*/
+
 //! ⁢Season 3 - Episode - 8 - Building Real-time Live Chat Feature
 //* season 3 other episodes are about hosting the backend and frontend  , sending emails using aws ses,payment gateway integration with razorpay, so we will host in another place as aws want credit card details, and razorpay we have integrated , so we will build the live chat feature using socket.io .
 //*What is Socket.IO ?
@@ -1662,10 +1711,45 @@ const user = useSelector((store) => store.user);
     socket.on("joinChat", ({ userId, targetUserId }) => {
       //* like two have a conversation between two people there should separate room , similarly we need to create separate roomId to chat using socket io, which should be unique, because we can't mix, other people's conversation that's why we are getting the targetUserId and userId to create a separate roomId,
 
-      const roomId = [userId, targetUserId].join("_");
+      const roomId = [userId, targetUserId].sort().join("_");
       console.log("Room Id:" + roomId);
       socket.join(roomId);
     });
     */
+//* so, when two people are chatting the roomId should same then only they can chat , and as we written .sort method before .join method then only it will be same .like this:-  const roomId = [userId, targetUserId].sort().join("_");
+//* now it will work as expected , so both roomIds are same because of sort() method;
+//* as the roomId is same for both user's so they can connect with each other ,safely , and the chat will not connect to others , it will be between two users only,
+//* now we can add a state variable in chat component then add that as the input value like below:-
+/*
+ * const [newMessage, setNewMessage] = useState("");//* to get the value user is typing in the input box
+       <input
+              className="inline p-2 m-2 lg:w-[94%] w-[85%] border-2 border-amber-50"
+              type="text"
+!              value={newMessage}
+!             onChange={(e)=>{setNewMessage(e.target.value)}}
+            />
+*/
+//* now we will write a sendMessage function which will be called when the user will click on send message icon ,
+//* function to send message to server on click of send message icon
+/* const sendMessage = () => {
+    const socket = createSocketConnection();
+    //* sending name,userId,targetUserId,text to the server
+    socket.emit("sendMessage", {
+      firstName: user?.data?.firstName,
+      userId,
+      targetUserId,
+      text: newMessage,
+    });
+  };*/
+//*---------backend
+//* now in backend socket.js we will receive , the this event and that same id so the message can reach to the same user, and also emit a new event to send it another user the text message
+/*
+socket.on("sendMessage", ({ firstName, userId, targetUserId, text }) => {
+      //* client is sending the message through this sendMessage event now we have send it to another user we have to send this message another user so  we have again send it to the same room
+      const roomId = [userId, targetUserId].sort().join("_");
+      console.log(firstName + " " + text);
+      //* sending message from the server to another client in the same roomId  by emitting this new "messageReceived" event, and we are sending the firstName and the message.
+      io.to(roomId).emit("messageReceived" + [firstName, text]);
+    });*/
 
 //! for production upload, change the constants url to actual one, before making the dist folder

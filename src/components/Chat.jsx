@@ -6,6 +6,7 @@ import { useSelector } from "react-redux";
 const Chat = () => {
   const { targetUserId } = useParams(); //* to gets access to the params sent through the url path
   // console.log(targetUserId);
+  const [newMessage, setNewMessage] = useState(""); //* to get the value user is typing in the input box
   const [messages, setMessages] = useState([{ text: "Hello World" }]);
   const user = useSelector((store) => store.user);
   const userId = user?.data?._id; //* writing optional chaining is important here react, render every in multiple cycles that;s why as initially the value of user store will be empty so, if we don;t write optional chaining then it will through error
@@ -28,7 +29,21 @@ const Chat = () => {
     return () => {
       socket.disconnect();
     };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [userId, targetUserId]);
+
+  //* function to send message to server on click of send message icon
+  const sendMessage = () => {
+    const socket = createSocketConnection(); //* creating the socket connection
+    //* sending name,userId,targetUserId,text to the server
+    socket.emit("sendMessage", {
+      firstName: user?.data?.firstName,
+      userId,
+      targetUserId,
+      text: newMessage,
+    });
+  };
+
   return (
     <div>
       <div className="p-2">
@@ -85,8 +100,12 @@ const Chat = () => {
             <input
               className="inline p-2 m-2 lg:w-[94%] w-[85%] border-2 border-amber-50"
               type="text"
+              value={newMessage}
+              onChange={(e) => {
+                setNewMessage(e.target.value);
+              }}
             />
-            <span className="mt-4 ml-1 cursor-pointer ">
+            <span onClick={sendMessage} className="mt-4 ml-1 cursor-pointer ">
               <svg
                 xmlns="http://www.w3.org/2000/svg"
                 fill="none"

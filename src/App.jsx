@@ -11,12 +11,14 @@ import Connections from "./components/Connections";
 import Requests from "./components/Requests";
 import Premium from "./components/Premium";
 import Chat from "./components/Chat";
+import ScrollingToTop from "./components/ScrollingToTop";
 
 function App() {
   return (
     <>
       <Provider store={appStore}>
         <BrowserRouter basename="/">
+          <ScrollingToTop />
           <Routes>
             <Route path="/" element={<Body />}>
               <Route path="/" element={<Feed />}></Route>
