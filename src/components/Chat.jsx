@@ -7,7 +7,7 @@ const Chat = () => {
   const { targetUserId } = useParams(); //* to gets access to the params sent through the url path
   // console.log(targetUserId);
   const [newMessage, setNewMessage] = useState(""); //* to get the value user is typing in the input box
-  const [messages, setMessages] = useState([{ text: "Hello World" }]);
+  const [messages, setMessages] = useState([]);
   const user = useSelector((store) => store.user);
   const userId = user?.data?._id; //* writing optional chaining is important here react, render every in multiple cycles that;s why as initially the value of user store will be empty so, if we don;t write optional chaining then it will through error
   console.log(user);
@@ -18,19 +18,28 @@ const Chat = () => {
     console.log(userId, targetUserId);
     const socket = createSocketConnection();
 
-    //* as soon as the page loaded, the socket connection is made and join chat event is emitted
+    //* as soon as the page loaded, the socket connection is made and join chat event is emitted, to connecting two users
     socket.emit("joinChat", {
       firstName: user.data.firstName,
       userId,
       targetUserId,
     });
-    console.log(socket);
+
+    //* receiving the message other side user has sent, by receiving the emit message event
+    socket.on("messageReceived", ({ firstName, text }) => {
+      console.log(firstName + " " + text);
+      console.log(text);
+      setMessages((messages) => [...messages, { firstName, text }]);
+    });
+
     //* clean up function for disconnecting the socket connection when the component unmounts
     return () => {
       socket.disconnect();
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [userId, targetUserId]);
+
+  //*
 
   //* function to send message to server on click of send message icon
   const sendMessage = () => {
@@ -42,6 +51,8 @@ const Chat = () => {
       targetUserId,
       text: newMessage,
     });
+    //* after sending the message setting the input element empty
+    setNewMessage("");
   };
 
   return (
@@ -67,13 +78,10 @@ const Chat = () => {
                       </div>
                     </div>
                     <div className="chat-header">
-                      Obi-Wan Kenobi
+                      {message.firstName}
                       <time className="text-xs opacity-50">12:45</time>
                     </div>
-                    <div className="chat-bubble">
-                      You were the Chosen One! be a good developer and amaze
-                      every one
-                    </div>
+                    <div className="chat-bubble">{message.text}</div>
                     <div className="chat-footer opacity-50">Delivered</div>
                   </div>
                   <div className="chat chat-end">

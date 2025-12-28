@@ -1740,6 +1740,8 @@ const user = useSelector((store) => store.user);
       targetUserId,
       text: newMessage,
     });
+      //* after sending the message setting the input element empty
+    setNewMessage("")
   };*/
 //*---------backend
 //* now in backend socket.js we will receive , the this event and that same id so the message can reach to the same user, and also emit a new event to send it another user the text message
@@ -1752,4 +1754,101 @@ socket.on("sendMessage", ({ firstName, userId, targetUserId, text }) => {
       io.to(roomId).emit("messageReceived" + [firstName, text]);
     });*/
 
+//*******Frontend */
+//* now we emitted the event from  backend so now we have to receive that event in the frontend so the users can see the messages they are sending to each other,so in chat.js file we will receive that emitted event inside the useEffect hook, like below:-
+//* receiving the message other side user has sent, by receiving the emit message event from backend
+/*    socket.on("messageReceived", ({ firstName, text }) => {
+      console.log(firstName + " " + text);
+      console.log(text);
+      setMessages((messages) => [...messages, { firstName, text }]);
+    });*/
+
+//* *****Backend
+//* now if any other user get to know the userId of both people then they can get access to chats , so we can make it more secure so till now we were using the userId and targetUserId , to create the roomId, like a plain String,but it is not secure , so in backend  we will socket.js file we will create a getSecureRoomId function where we will receive the userId and targetUserId and create a hash using this userId and targetUserId using the crypto module after requiring crypto module, like below:-
+/*
+const getSecureRoomId = (userId, targetUserId) => {
+  return crypto
+    .createHash("sha256")
+    .update([userId, targetUserId].sort().join("_"))
+    .digest("hex");
+};
+*/
+//* and we will use this function to generate the room id in join chat event and sendMessage event present in the same socket.js file and pass the userId and targetUserId.
+
+//!  ⁢Season 3 - Episode-09 | Building Real-time Live Chat Feature
+//* ------backend
+//* till now we were not storing the chats so when we were refreshing the page the chats was getting deleted, so we have to save the chats in our database, so first we have to create a schema in backend, so inside the models we will create a chat.js folder and there we will write the schema to save the chat messages, so the first field will be participants, and as the chat can  happen between two people so , participants will be a array, but as we are creating it as an array if we want to build a group chat feature in future then we can also do that, but if we added sender and receiver field instead of participants arrays then in future we could not add more participants in the future, and participants field type will be mongoose.Schema.types.ObjectId, so there will be two objects ids o9f two users , and the this field wil also have a ref with user schema, and this will be required field, now the second field will be a array of individual messages,so we ,so how do we define a single message, so we can include a schema inside another schema, so above the chatSchema we will create another messageSchema, which will have a senderId and its type will be again mongoose.Schema.types.ObjectId and text field which will be string and we will also add the timeStamps, then we will add this schema as the value of messages field in chatMessages schema.
+/*
+const mongoose = require("mongoose");
+
+const messageSchema = new mongoose.Schema(
+  {
+    senderId: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "User",
+      required: true,
+    },
+    text: {
+      type: String,
+      required: true,
+    },
+  },
+  {
+    timestamps: true,
+  }
+);
+
+const chatSchema = new mongoose.Schema({
+  participants: [
+    {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "User",
+      required: true,
+    },
+  ],
+  messages: [messageSchema],
+});
+
+const ChatModel = mongoose.model("Chat", chatSchema); //*1st param name and 2nd is schema
+
+//* exporting the model
+module.exports = ChatModel;
+*/
+//* and then whenever now someOne send a messages we will save it to database , so we will got sockets.js and inside socket.js file when sendMessage event is happening then we will save the chat message so , first we will check if there is already and existing chat and we will just updated the chat and if there is no existing chat we will create a new chat and update it:-
+/*
+socket.on(
+      "sendMessage",
+      async ({ firstName, userId, targetUserId, text }) => {
+        //* client is sending the message through this sendMessage event now we have send it to another user we have to send this message another user so  we have again send it to the same room
+        const roomId = getSecureRoomId(userId, targetUserId);
+        console.log(firstName + " " + text);
+        //* when user is sending message to another user then if this first time they are chatting then we will create a new chat but if they already did chat and a chat already exist in the database then we will just update the database, other wise we will create a new chat a add chat messages
+ !       try {
+ !         //* finding if chat already exist
+ !         let chat = await Chat.findOne({
+ !           participants: { $all: [userId, targetUserId] },
+ !         }); //* $all means find finding the array where there is participant i!s userId and targetUserId and in future if we add any other group participants w!e can also add other people if we want.
+!
+ !         //* if there is no existing chat then creating a new chat
+ !         if (!chat) {
+ !           chat = new Chat({
+ !             participants: [userId, targetUserId],
+ !             messages: [],
+ !           });
+ !         }
+ !         //* pushing chat messages
+ !         chat.messages.push({
+ !           senderId: userId,
+ !           text,
+ !         });
+ !         //* saving the chat messages
+ !         await chat.save();
+ !       } catch (err) {
+ !         console.error(err.message);
+ !       }
+!
+ !       //* sending message from the server to another client  by emitting this new message receive event, and we are sending the firstName and the message
+      }
+    );
+*/
 //! for production upload, change the constants url to actual one, before making the dist folder
