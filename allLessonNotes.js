@@ -1823,32 +1823,81 @@ socket.on(
         const roomId = getSecureRoomId(userId, targetUserId);
         console.log(firstName + " " + text);
         //* when user is sending message to another user then if this first time they are chatting then we will create a new chat but if they already did chat and a chat already exist in the database then we will just update the database, other wise we will create a new chat a add chat messages
- !       try {
- !         //* finding if chat already exist
- !         let chat = await Chat.findOne({
- !           participants: { $all: [userId, targetUserId] },
- !         }); //* $all means find finding the array where there is participant i!s userId and targetUserId and in future if we add any other group participants w!e can also add other people if we want.
-!
- !         //* if there is no existing chat then creating a new chat
- !         if (!chat) {
- !           chat = new Chat({
- !             participants: [userId, targetUserId],
- !             messages: [],
- !           });
- !         }
- !         //* pushing chat messages
- !         chat.messages.push({
- !           senderId: userId,
- !           text,
- !         });
- !         //* saving the chat messages
- !         await chat.save();
- !       } catch (err) {
- !         console.error(err.message);
- !       }
-!
- !       //* sending message from the server to another client  by emitting this new message receive event, and we are sending the firstName and the message
+        try {
+          //* finding if chat already exist
+          let chat = await Chat.findOne({
+            participants: { $all: [userId, targetUserId] },
+          }); //* $all means find finding the array where there is participant is userId and targetUserId and in future if we add any other group participants we can also add other people if we want.
+
+          //* if there is no existing chat then creating a new chat
+          if (!chat) {
+            chat = new Chat({
+              participants: [userId, targetUserId],
+              messages: [],
+            });
+          }
+          //* pushing chat messages
+          chat.messages.push({
+            senderId: userId,
+            text,
+          });
+          //* saving the chat messages
+          await chat.save();
+        } catch (err) {
+          console.error(err.message);
+        }
+
+        //* sending message from the server to another client  by emitting this new message receive event, and we are sending the firstName and the message
+        io.to(roomId).emit("messageReceived", { firstName, text });
       }
-    );
+    );*/
+
+//****** backend */
+//*building an api in the backend Getting past messages in frontend
+// * so we saved the messages in database and then when we again the load the website we need a way way to fetch the messages in frontend, so we need to build and api in backend to which will send the past messages saved in the database , to the frontend.
+//*so in the router  folder , we will create chat.js file , and create a chatRouter inside it and export it and then go to app.js file an include this file.now we will comeback to chat.js and write the chat api, like below:-
+/*
+const express = require("express");
+const Chat = require("../models/chat");
+const { userAuth } = require("../middlewares/auth");
+
+const chatRouter = express.Router();
+
+chatRouter.post("/chat", userAuth, async (req, res) => {
+  //* receiving  targetUserId from the req body
+  const { targetUserId } = req.body;
+
+  const userId = req.user._id;
+
+  try {
+    //* finding the existing chat so we can return the past messages
+    const chat = await Chat.findOne({
+      participants: { $all: { userId, targetUserId } },
+    }).populate({
+      path: "message.senderId",
+      select: "firstName lastName",
+    });//* populating firstName lastName
+
+    //* if there is no past  then we  messages  can create a new chat and send it to frontend
+    if (!chat) {
+      chat = new Chat({
+        participants: [userId, targetUserId],
+        messages: [],
+      });
+    }
+    //* saving chat
+    await chat.save();
+    //* sending the past chat (if existed ) or new empty chat(if there is no new previous chat)
+    res.json(chat);
+  } catch (err) {
+    res.status(400).json({ message: "something went wrong:- " + err.message });
+  }
+});
+
+module.exports = chatRouter;
 */
+
+//****frontend */
+//* now in the frontend we have to call this api and get the past messages to display on frontend.
+
 //! for production upload, change the constants url to actual one, before making the dist folder
