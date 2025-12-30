@@ -63,7 +63,7 @@ const Requests = () => {
 
   return (
     requests && (
-      <div>
+      <div className="mb-[-1720px] pb-4">
         <div className=" flex justify-center mx-auto">
           <h1 className=" w-62 font-bold text-3xl text-center my-4 bg-clip-text text-transparent bg-linear-to-r from-fuchsia-500 to-cyan-500">
             Requests

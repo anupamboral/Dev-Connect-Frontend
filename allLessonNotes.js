@@ -1874,7 +1874,7 @@ chatRouter.post("/chat", userAuth, async (req, res) => {
     const chat = await Chat.findOne({
       participants: { $all: { userId, targetUserId } },
     }).populate({
-      path: "message.senderId",
+      path: "messages.senderId",
       select: "firstName lastName",
     });//* populating firstName lastName
 
@@ -1899,5 +1899,133 @@ module.exports = chatRouter;
 
 //****frontend */
 //* now in the frontend we have to call this api and get the past messages to display on frontend.
+//* like below:-
+/*
+  const fetchChatMessages = async () => {
+    const chat = await axios.get(BASE_URL + "/chat/" + targetUserId, {
+      withCredentials: true,
+    });
+    console.log(chat.data.messages);
 
+    const chatMessages = chat?.data?.messages.map((msg) => {
+      const { senderId, text } = msg;
+      return {
+        firstName: senderId?.firstName,
+        lastName: senderId?.lastName,
+        text: text,
+      };
+    });
+    console.log(chatMessages);
+    //* adding all chat messages to the state variable
+    setMessages(chatMessages);
+    console.log(messages);
+    console.log(user?.data?.firstName);
+  };
+  */
+//* and as here we updated the messages so now we can render using the messages data on the ui, and then also depending on the firstName of the loggedInUser and firstName of the message , we can display loggedInUser's chat in the right side and display other user's chat in the left side, and using the daisy ui class.
+//* like below :-
+/*
+  return (
+    <div>
+      <div className="p-2">
+        <div className=" main-container max-h-[1000px]  lg:min-h-[70dvh] min-h-[80dvh] lg:max-w-[70dvw] mt-4  mx-auto  border-2 border-cyan-400 px-2 py-1">
+          <div className="heading-div flex justify-center border-b border-b-cyan-400">
+            <h1 className=" w-62 font-bold text-3xl text-center my-1 bg-clip-text text-transparent bg-linear-to-r from-fuchsia-500 to-cyan-500">
+              Chat
+            </h1>
+          </div>
+          <div
+            ref={scrollRef}
+            className="chat-message flex-1 overflow-scroll border-b-2 lg:h-[52dvh] h-[64dvh] border-amber-50 p-4 pl-2 m-2"
+          >
+            {messages.map((message, index) => {
+              return (
+                <div
+                  key={index}
+  !                className={
+   !                 "chat" +
+    !                (user?.data?.firstName === message.firstName
+     !                 ? " chat-end"
+       !               : " chat-start")
+      !            }
+                >
+                  <div className="chat-header">
+                    {`${message.firstName} ${message.lastName}`}
+                    <time className="text-xs opacity-50">
+                      {message.time ? message.time : currentIstTime}
+                    </time>
+                  </div>
+                  <div className="chat-bubble">{message.text}</div>
+                  <div className="chat-footer opacity-50">Seen</div>
+                </div>
+              );
+            })}
+          </div>
+          <div className="flex">
+            <input
+              className="inline p-2 m-2 lg:w-[94%] w-[85%] border-2 border-amber-50"
+              type="text"
+              onKeyDown={handleKeyDown}
+              value={newMessage}
+              placeholder="Type a message"
+              onChange={(e) => {
+                setNewMessage(e.target.value);
+              }}
+            />
+            <span onClick={sendMessage} className="mt-4 ml-1 cursor-pointer ">
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                fill="none"
+                viewBox="0 0 48 48"
+                id="Mail-Send-Email-Message--Streamline-Plump"
+                height="30"
+                width="30"
+              >
+                <desc>
+                  Mail Send Email Message Streamline Icon:
+                  https://streamlinehq.com
+                </desc>
+                <g id="mail-send-email-message--send-email-paper-airplane-deliver">
+                  <path
+                    id="Subtract"
+                    fill="#8fbffa"
+                    d="M3.99 7.33c-0.908 -2.236 1.144 -4.368 3.424 -3.578 7.73 2.679 22.423 8.422 35.323 17.184a3.683 3.683 0 0 1 0 6.127c-12.9 8.761 -27.594 14.505 -35.323 17.184 -2.28 0.79 -4.332 -1.343 -3.425 -3.579 1.95 -4.803 4.178 -9.412 5.287 -11.643a3.906 3.906 0 0 1 2.178 -1.93L20 23.999l-8.546 -3.095a3.906 3.906 0 0 1 -2.178 -1.93c-1.109 -2.231 -3.337 -6.84 -5.287 -11.644Z"
+                    stroke-width="3"
+                  ></path>
+                  <path
+                    id="Subtract_2"
+                    stroke="#2859c5"
+                    stroke-linejoin="round"
+                    d="M3.988 7.331c-0.907 -2.236 1.145 -4.368 3.425 -3.578 7.73 2.679 22.423 8.422 35.323 17.184a3.683 3.683 0 0 1 0 6.127c-12.9 8.761 -27.593 14.505 -35.323 17.184 -2.28 0.79 -4.332 -1.343 -3.425 -3.579 1.95 -4.803 4.178 -9.412 5.287 -11.643a3.907 3.907 0 0 1 2.178 -1.93L20 24l-8.547 -3.095a3.907 3.907 0 0 1 -2.178 -1.93c-1.109 -2.231 -3.337 -6.84 -5.287 -11.644Z"
+                    stroke-width="3"
+                  ></path>
+                </g>
+              </svg>
+            </span>
+          </div>
+        </div>
+      </div>
+    </div>
+    */
+
+//* to automatically scroll the chat messages portion to view new message so user don't need to scroll every time we are displaying a new message gets added by user, or other user sends a new message.
+//* in the top we created a useRef for reference , and created a useEffect hook which will be called whenever messages state variable update like below:-
+/*
+const scrollRef = useRef(null);
+//* we have to always write this declaration after the messages state declaration
+useEffect(() => {
+  //* written to see the updated value of messages because  In React, state updates are asynchronous and reference-based.Because setMessages is asynchronous, the value of messages will not change immediately on the very next line of code. so to see it's updated value we written this  useEffect which show the value messages get updated
+  console.log("Updated messages:", messages);
+
+  //* to scroll to bottom automatically when new message gets added. so the messages array gets updated, so in the dependency array messages is written
+  if (scrollRef.current) {
+    scrollRef.current.scrollTo({
+      top: scrollRef.current.scrollHeight,
+      behavior: "smooth",
+    });
+  } //* to automatically scroll the chat messages portion to view new message so user don't need to scroll every time we are displaying a new message gets added by user, or other user sends a new message.
+}, [messages]);
+*/
+//! adjusting footer distance
+//* the edit Profile page can have a longer height when it getting displayed on mobile, as the two side by side components  so the footer does have a very longer margin top to have longer distance required in mobile screens, and but except the edit profile component , in other components(connection, requests, feed, premium)  parent div, we have given a  negative margin because there the longer footer distance is not required
 //! for production upload, change the constants url to actual one, before making the dist folder

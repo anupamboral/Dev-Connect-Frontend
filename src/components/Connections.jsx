@@ -40,7 +40,7 @@ const Connections = () => {
   if (!connections) return;
   if (connections.length === 0) return <h1>No connection found</h1>;
   return (
-    <div>
+    <div className="mb-[-1720px] pb-4">
       <div className=" flex justify-center">
         <h1 className=" w-62 font-bold text-3xl text-center my-4 bg-clip-text text-transparent bg-linear-to-r from-fuchsia-500 to-cyan-500">
           Connections

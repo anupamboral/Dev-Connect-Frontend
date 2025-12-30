@@ -64,7 +64,7 @@ const Premium = () => {
   };
 
   return isPremiumUser ? (
-    <div className="flex justify-center lg:w-[98dvw]">
+    <div className="flex justify-center lg:w-[98dvw] mb-[-1500px] pb-4">
       <div className=" lg:flex justify-center m-auto mt-4 lg:mt-10">
         <div className="card w-96 bg-base-300 shadow-sm">
           <div className="card-body">

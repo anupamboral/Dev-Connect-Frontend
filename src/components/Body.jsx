@@ -56,8 +56,7 @@ function Body() {
   }, []);
 
   return (
-    <div className="relative min-h-[1800px]">
-  
+    <div className="relative ">
       <Navbar />
       <Outlet />
       <Footer />

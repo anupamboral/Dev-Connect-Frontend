@@ -44,8 +44,9 @@ const Feed = () => {
   //* logic to show no new users found when the api responded empty array and feed slice is set to null
   if (!feed) {
     //* Early return
+
     return (
-      <div className=" flex justify-center mx-auto">
+      <div className=" flex justify-center mx-auto ">
         <h1 className=" w-62 font-bold text-3xl text-center my-4 bg-clip-text text-transparent bg-linear-to-r from-fuchsia-500 to-cyan-500">
           No new Users Found
         </h1>
@@ -56,7 +57,7 @@ const Feed = () => {
   //* logic to show the skeleton card  when feed array is empty , so fetch new users
   if (feed.length === 0) {
     return (
-      <div className=" flex flex-col justify-center items-center mx-auto">
+      <div className=" flex flex-col justify-center items-center mx-auto ">
         <h1 className=" w-62 font-bold text-3xl text-center my-4 bg-clip-text text-transparent bg-linear-to-r from-fuchsia-500 to-cyan-500">
           Load new users
         </h1>
@@ -82,7 +83,7 @@ const Feed = () => {
 
   return (
     feed && (
-      <div className="flex justify-center ">
+      <div className="flex justify-center mb-[-520px] pb-4">
         <UserCard feed={feed[0]} buttonDisplay={true} emailDisplay={false} />
       </div>
     )
