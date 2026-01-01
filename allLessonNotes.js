@@ -2116,10 +2116,10 @@ useEffect(() => {
 //* then we will go to utils/sockets.js and add events to handle the online status change and lastSeen updating feature:-
 //* first out side the initializeSocket function we will add this:-
 //* to add lastSeen and online status
-const User = require("../models/user");
+//*const User = require("../models/user");
 //* Initialize a Map to store key-value pairs where Key = UserID and Value = SocketID
 //* This allows for quick lookups to check if a specific user is currently connected to the server
-const activeUsers = new Map(); // Track userId -> socketId
+//*const activeUsers = new Map(); // Track userId -> socketId
 
 //* then inside the initializeSocket function we will add these events:-
 /*
