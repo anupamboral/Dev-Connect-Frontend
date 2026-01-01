@@ -111,7 +111,14 @@ const Connections = () => {
                     )}
                     <p className="text-white">{connection.about}</p>
                   </div>
-                  <Link to={"/chat/" + connection._id}>
+                  <Link
+                    to={
+                      "/chat/" +
+                      connection._id +
+                      "/" +
+                      (connection.firstName + " " + connection.lastName)
+                    }
+                  >
                     <button className="btn btn-secondary" type="button">
                       Chat
                     </button>

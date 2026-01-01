@@ -21,7 +21,9 @@ const EditProfile = ({ user }) => {
   const [skills, setSkills] = useState(user?.data?.skills || []);
   const [age, setAge] = useState(user?.data?.age || 18);
   const [photoUrl, setPhotoUrl] = useState(user?.data?.photoUrl || "");
-  const [gender, setSelectedGenderValue] = useState(user?.data?.gender || "");
+  const [gender, setSelectedGenderValue] = useState(
+    user?.data?.gender || "male"
+  ); //* by default when user first open there gender will be male they can change it , but if we keep empty string and the user does not set the gender, so because of schema validation it will through error so , by default for first load while creating a new profile , we will keep it male , so while creating first time his/her profile if the user does not choose any gender then while saving it does not create any problem.
 
   const [showToast, setShowToast] = useState(false);
 

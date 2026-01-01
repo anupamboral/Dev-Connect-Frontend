@@ -1814,16 +1814,32 @@ const ChatModel = mongoose.model("Chat", chatSchema); //*1st param name and 2nd 
 //* exporting the model
 module.exports = ChatModel;
 */
-//* and then whenever now someOne send a messages we will save it to database , so we will got sockets.js and inside socket.js file when sendMessage event is happening then we will save the chat message so , first we will check if there is already and existing chat and we will just updated the chat and if there is no existing chat we will create a new chat and update it:-
+//* we will check if both users are friends are not by finding the accepted status between two users user using connection request model , and while doing the query we have to check using $or query because loggedInUser can be either the fromUserId or targetUserId and same for other side user, and then whenever  someOne send a messages we will save it to database , so we will got sockets.js and inside socket.js file when sendMessage event is happening then we will save the chat message so , first we will check if there is already and existing chat and we will just updated the chat and if there is no existing chat we will create a new chat and update it:-
 /*
 socket.on(
       "sendMessage",
       async ({ firstName, userId, targetUserId, text }) => {
+      try{
+          //* send message should only happen if the both users are friends , other wise not so check if userId(loggedInUser) and targetUserId(other other side user are friends are not , if not then we will just throw error)
+          const friendshipStatus = await ConnectionRequestModel.findOne({
+            $or: [
+              {
+                fromUserId: userId,
+                toUserId: targetUserId,
+                status: "accepted",
+              },
+              {
+                fromUserId: targetUserId,
+                toUserId: userId,
+                status: "accepted",
+              },
+            ],
+          });
         //* client is sending the message through this sendMessage event now we have send it to another user we have to send this message another user so  we have again send it to the same room
         const roomId = getSecureRoomId(userId, targetUserId);
         console.log(firstName + " " + text);
         //* when user is sending message to another user then if this first time they are chatting then we will create a new chat but if they already did chat and a chat already exist in the database then we will just update the database, other wise we will create a new chat a add chat messages
-        try {
+        
           //* finding if chat already exist
           let chat = await Chat.findOne({
             participants: { $all: [userId, targetUserId] },
@@ -2025,7 +2041,204 @@ useEffect(() => {
     });
   } //* to automatically scroll the chat messages portion to view new message so user don't need to scroll every time we are displaying a new message gets added by user, or other user sends a new message.
 }, [messages]);
+//* and in add scrollRef in the chat messages showing div like below:-
+/*
+ *         <div
+ *           ref={scrollRef}
+            className="chat-message flex-1 overflow-scroll border-b-2 lg:h-[52dvh] h-[64dvh] border-amber-50 p-4 pl-2 m-2"
+          >
+            {messages.map((message, index) => {
+              return (
+                <div
+                  key={index}
+                  className={
+                    "chat my-2" +
+                    (user?.data?.firstName === message.firstName
+                      ? " chat-end"
+                      : " chat-start")
+                  }
+                >
+                  <div className="chat-header">
+                    {`${message.firstName} ${message.lastName}`}
+                    <time className="text-xs opacity-50">
+                      {message.formattedTime
+                        ? message.formattedTime
+                        : currentIstTime}
+                    </time>
+                  </div>
+                  <div className="chat-bubble">{message.text}</div>
+
+                  <div className="chat-footer opacity-50">
+                    {message.date ? `Seen on ${message.date}` : `Seen Today`}
+                  </div>
+                </div>
+              );
+            })}
+          </div>
+/*
 */
+//////////////////*backend******************
+//* in the the sendMessage event written in utils/socket.js (backend) we also authentication check to check if both users are friends are not , otherwise two user who are not friends but can also do chat , so we added this authentication,  we will check if both users are friends are not by finding the accepted status between two users user using connection request model , and while doing the query we have to check using $or query because loggedInUser can be either the fromUserId or targetUserId and same for other side user:-
+//* in backend utils/sockets.js inside send message event function
+/*         //* send message should only happen if the both users are friends , other wise not so check if userId(loggedInUser) and targetUserId(other other side user are friends are not , if not then we will just throw error)
+          const friendshipStatus = await ConnectionRequestModel.findOne({
+            $or: [
+              {
+                fromUserId: userId,
+                toUserId: targetUserId,
+                status: "accepted",
+              },
+              {
+                fromUserId: targetUserId,
+                toUserId: userId,
+                status: "accepted",
+              },
+            ],
+          });*/
+
+//! adding online status feature and lastSeen feature in chat
+//*---------backend------
+//* in backend in the schema first we will got to user schema and add two fields to store the online status and lastSeen time
+//* in models/user.js adding fields
+/*
+     status: {
+      //* field added to store user's online status information
+      type: String,
+      enum: ["online", "offline"],
+      default: "offline",
+    },
+    lastSeen: {
+      //* field added to store user's lastSeen  information
+      type: Date,
+      default: Date.now(),
+    },*/
+
+//* then we will go to utils/sockets.js and add events to handle the online status change and lastSeen updating feature:-
+//* first out side the initializeSocket function we will add this:-
+//* to add lastSeen and online status
+const User = require("../models/user");
+//* Initialize a Map to store key-value pairs where Key = UserID and Value = SocketID
+//* This allows for quick lookups to check if a specific user is currently connected to the server
+const activeUsers = new Map(); // Track userId -> socketId
+
+//* then inside the initializeSocket function we will add these events:-
+/*
+//* Listen for the "setup" event when a client connects and sends their unique userId
+    socket.on("setup", async (userId) => {
+      //* If no userId is provided, exit the function early to prevent errors
+      if (!userId) return;
+
+      //* Join a socket room named after the userId to allow private messaging/targeted events
+      socket.join(userId);
+
+      //* Attach the userId directly to the socket object for easy access during disconnection
+      socket.userId = userId;
+
+      //* Map the userId to the current socket.id in an in-memory tracking Map (activeUsers)
+      activeUsers.set(userId, socket.id);
+
+      //* Update the user's status to "online" in the MongoDB database
+      await User.findByIdAndUpdate(userId, { status: "online" });
+
+      //* Broadcast to all connected clients that this specific user is now online
+      io.emit("user-status-change", { userId, status: "online" });
+    });
+
+    //* Handle a client's request to get the status (online/offline) of a specific person
+    socket.on("get-user-status", async (targetUserId) => {
+      //* Fetch only the 'status' and 'lastSeen' fields from the database for the target user
+      const user = await User.findById(targetUserId).select("status lastSeen");
+
+      //* Send the status data back ONLY to the specific client who requested it
+      socket.emit("initial-status-response", {
+        userId: targetUserId,
+        status: user?.status || "offline", //* Default to offline if the user isn't found
+        lastSeen: user?.lastSeen, //* Provide the timestamp of when they were last active
+      });
+    });
+
+    //* Listen for the built-in "disconnect" event when a user closes the app or loses internet
+    socket.on("disconnect", async () => {
+      //* Retrieve the userId we stored on the socket object during the "setup" phase
+      const userId = socket.userId;
+
+      //* Proceed only if the socket had a userId associated with it
+      if (userId) {
+        //* Capture the current timestamp to mark when the user went offline
+        const lastSeen = new Date();
+
+        //* Update the database to set status to "offline" and save the current time as lastSeen
+        await User.findByIdAndUpdate(userId, { status: "offline", lastSeen });
+
+        //* Remove the user from our in-memory Map of active connections
+        activeUsers.delete(userId);
+
+        //* Notify all other clients that this user is now offline and provide their lastSeen time
+        io.emit("user-status-change", {
+          userId,
+          status: "offline",
+          lastSeen,
+        });
+      }
+    });
+
+    //* ------frontend---------
+    //* in frontend chat.js using the events we written in backend, 
+    //* state variable to store chat pat partner's online status and lastSeen data
+      const [partnerStatus, setPartnerStatus] = useState({
+        status: "offline",
+        lastSeen: null,
+      });
+    //* useEffect which will be called whenever userId or targetUserId changes when this component receives the targetUserId value from params and userId value coming from the subscribed userSlice,
+      useEffect(() => {
+        //* cresting socket connection
+        const socket = createSocketConnection();
+        //* Notify server you are online
+        socket.emit("setup", userId);
+    
+        //* ASK the server for the current status of the partner immediately
+        socket.emit("get-user-status", targetUserId);
+    
+        //* Listen for the specific initial response
+        socket.on("initial-status-response", (data) => {
+          if (data.userId === targetUserId) {
+            setPartnerStatus(data);
+          }
+        });
+    
+        //* 4. Listen for real-time broadcasts
+        socket.on("user-status-change", (data) => {
+          if (data.userId === targetUserId) setPartnerStatus(data);
+        });
+    
+        //* CLEANUP: Essential to prevent status "stuck" online
+        return () => {
+          console.log("useEffect unmounted");
+          socket.off("user-status-change");
+          socket.off("initial-status-response");
+          socket.disconnect(); // Triggers server 'disconnect'
+        };
+      }, [targetUserId, userId]);
+    
+      useEffect(() => {
+        //* written to see partner status state variable's value when it updates
+        console.log(partnerStatus);
+      }, [partnerStatus]);
+    */
+//* then we used the partner Status state variable to show the online status and last seen in the Ui,  like below:-
+/*
+<p className="self-center text-sm pb-2">
+ * {partnerStatus.status === "online" ? (
+ *   <span className="text-green-500">● Online</span>
+  ) : (
+    <span className="text-shadow-gray-400">
+  *    Last seen: {getFormattedLastSeen(partnerStatus.lastSeen)}
+    </span>
+  )}
+</p>;*/
+//* add comments for the chat timestamps formatting function, both for previous received messages and new added messages receiving through messageReceived event.
+//! getFormattedLastSeen() function
+//* and above we can see a getFormattedLastSeen function , so inside the utils folder we added a file lastSeenTimeAgo.js file and inside it , we added getFormattedLastSeen() function because from backend lastSeen is coming 2026-01-01T06:46:23.640Z format , because saved it in the database in js date format using new Date() function , but while showing the lastSeen on Ui we wanted for TODAY: Show "5 minutes ago" format , YESTERDAY: Show "yesterday" format, for within THIS YEAR (but more than 1 day ago): Show "24 Oct" format without showing the year,MORE THAN A YEAR AGO: Show "24 Oct, 24" format with showing the year and then we exported the function , and imported it in chat.js file and then used where we showing the last seen on the ui .
 //! adjusting footer distance
 //* the edit Profile page can have a longer height when it getting displayed on mobile, as the two side by side components  so the footer does have a very longer margin top to have longer distance required in mobile screens, and but except the edit profile component , in other components(connection, requests, feed, premium)  parent div, we have given a  negative margin because there the longer footer distance is not required
 //! for production upload, change the constants url to actual one, before making the dist folder
