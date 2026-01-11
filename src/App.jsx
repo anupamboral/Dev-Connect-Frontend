@@ -4,7 +4,7 @@ import Body from "./components/Body";
 import Login from "./components/Login";
 import Profile from "./components/Profile";
 import { Provider } from "react-redux";
-import appStore from "./utils/appstore";
+import appStore from "./utils/appstore.js";
 import Feed from "./components/Feed";
 import Error from "./components/Error";
 import Connections from "./components/Connections";
