@@ -21,7 +21,7 @@ export const getFormattedLastSeen = (lastSeen) => {
     (startOfToday - startOfLastSeen) / (1000 * 60 * 60 * 24)
   );
 
-  // 1. TODAY: Show "5 minutes ago" or "2 hours ago"
+  // 1. TODAY: Show "5 minutes ago" or "2 hours ago" format
   if (diffInDays === 0) {
     const rtf = new Intl.RelativeTimeFormat("en", { numeric: "auto" });
     const secondsAgo = Math.round((lastSeenDate - now) / 1000);
@@ -35,12 +35,20 @@ export const getFormattedLastSeen = (lastSeen) => {
     return rtf.format(hoursAgo, "hour");
   }
 
-  // 2. YESTERDAY: Show "yesterday"
+  // 2. YESTERDAY: Show "2.37 pm, yesterday" format
   if (diffInDays === 1) {
-    return "yesterday";
+    const timeString = new Intl.DateTimeFormat("en-US", {
+      hour: "numeric",
+      minute: "2-digit",
+      hour12: true,
+    })
+      .format(lastSeenDate)
+      .toLowerCase();
+
+    return `${timeString}, yesterday`;
   }
 
-  // 3. MORE THAN A YEAR AGO: Show "24 Oct, 24"
+  // 3. MORE THAN A YEAR AGO: Show "24 Oct, 24" format
   if (lastSeenDate.getFullYear() < now.getFullYear()) {
     return new Intl.DateTimeFormat("en-GB", {
       day: "numeric",
@@ -51,9 +59,16 @@ export const getFormattedLastSeen = (lastSeen) => {
       .replace(/ /g, " "); // Standardizing spaces
   }
 
-  // 4. THIS YEAR (but more than 1 day ago): Show "24 Oct"
+  // 4. THIS YEAR (but more than 1 day ago): Show "9.29.pm, 24 Oct" format
   return new Intl.DateTimeFormat("en-GB", {
-    day: "numeric",
+    hour12: true,
     month: "short",
-  }).format(lastSeenDate);
+    hour: "numeric",
+    day: "numeric",
+    minute: "2-digit",
+  })
+    .format(lastSeenDate)
+    .split(",")
+    .reverse()
+    .join(", ");
 };

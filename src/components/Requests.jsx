@@ -85,10 +85,10 @@ const Requests = () => {
                       <img
                         className="h-36 w-36 rounded-4xl"
                         src={request.fromUserId.photoUrl}
-                        alt="Shoes"
+                        alt="userImg"
                       />
                     </div>
-                    <div className="flex flex-col  ">
+                    <div className="flex flex-col justify-start ">
                       <div className="flex justify-center lg:justify-start">
                         <h2
                           className={`self-center lg:self-start  card-title  ${

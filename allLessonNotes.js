@@ -1564,6 +1564,8 @@ paymentRouter.post("/payment/webhook", async (req, res) => {
 //   verifyPremiumUser();
 // }, []); //* to run only once on component mount and load the premium status
 //* but as we implemented , the verified tick for premium user, so let's say the user is opening the website after some days, ,so in his profile section and in the nav bar, if the user is premium user already then before even opening the premium page we want still want to show the , premium badge, so in the nav bar component we subscribed both the user slice and the premium slice, so either the user just activating the subscription or already a premium user and and coming after some time in both cases the badge gets displayed, and in the edit profile section we only subscribed to premium slice, because when we first activating the subscription then only premium slice updates , so to display the badge in navbar adding both slices is required, but in editProfile section that is not required.
+//! in "/user/requests/received" api and also user safe data constant in user.js we also added isPremiumUser, and membershipStatus , so the frontend can get the premium user status and membership status data , so if the us premium or not , because depending on it we are displaying the blue tick.
+
 //!ScrollingToTop component
 //* when we were in the connection component then when we were scrolling to the middle portion to find any connection and open chat of that connection then while chat page was opening chat page also opening from the middle portion but we wanted that when the route change happen then the chat page should open from the top and not scrolled , so we added a scrollingToTop component inside components folder, and written below code:-
 /*
@@ -1744,7 +1746,7 @@ const user = useSelector((store) => store.user);
     setNewMessage("")
   };*/
 //*---------backend
-//* now in backend socket.js we will receive , the this event and that same id so the message can reach to the same user, and also emit a new event to send it another user the text message
+//* now in backend socket.js we will receive , the this event and that same id so the message can reach to the same user, and also emit a new event to send it another user the text message( //! further code is also added in future to add the chat timestamp to see it search in this file "ChatTimeStamp Feature in Past messages(in fetchChatMessage function) and new messages ("messageReceived event in useEffect hook"))
 /*
 socket.on("sendMessage", ({ firstName, userId, targetUserId, text }) => {
       //* client is sending the message through this sendMessage event now we have send it to another user we have to send this message another user so  we have again send it to the same room
@@ -1752,6 +1754,8 @@ socket.on("sendMessage", ({ firstName, userId, targetUserId, text }) => {
       console.log(firstName + " " + text);
       //* sending message from the server to another client in the same roomId  by emitting this new "messageReceived" event, and we are sending the firstName and the message.
       io.to(roomId).emit("messageReceived" + [firstName, text]);
+       //* further code is also added in future to add the chat timestamp to see it search "ChatTimeStamp Feature in Past messages(in fetchChatMessage function) and new messages ("messageReceived event in useEffect hook")
+     
     });*/
 
 //*******Frontend */
@@ -1761,6 +1765,7 @@ socket.on("sendMessage", ({ firstName, userId, targetUserId, text }) => {
       console.log(firstName + " " + text);
       console.log(text);
       setMessages((messages) => [...messages, { firstName, text }]);
+       //* further code is also added in future to add the chat timestamp to see it search "ChatTimeStamp Feature in Past messages(in fetchChatMessage function) and new messages ("messageReceived event in useEffect hook")
     });*/
 
 //* *****Backend
@@ -1865,6 +1870,7 @@ socket.on(
 
         //* sending message from the server to another client  by emitting this new message receive event, and we are sending the firstName and the message
         io.to(roomId).emit("messageReceived", { firstName, text });
+        //* further code is also added in future to add the chat timestamp to see it search "ChatTimeStamp Feature in Past messages(in fetchChatMessage function) and new messages ("messageReceived event in useEffect hook")
       }
     );*/
 
@@ -1872,6 +1878,7 @@ socket.on(
 //*building an api in the backend Getting past messages in frontend
 // * so we saved the messages in database and then when we again the load the website we need a way way to fetch the messages in frontend, so we need to build and api in backend to which will send the past messages saved in the database , to the frontend.
 //*so in the router  folder , we will create chat.js file , and create a chatRouter inside it and export it and then go to app.js file an include this file.now we will comeback to chat.js and write the chat api, like below:-
+//* /chat/:targetUserId api ( in future we have done some changes in this api , to limit how many messages we will send in every api call to see search "Limiting messages when fetching messages from database using fetchChatMessages function" and see the "/chat/:targetUserId api changes" portion )
 /*
 const express = require("express");
 const Chat = require("../models/chat");
@@ -1879,13 +1886,10 @@ const { userAuth } = require("../middlewares/auth");
 
 const chatRouter = express.Router();
 
-chatRouter.post("/chat", userAuth, async (req, res) => {
-  //* receiving  targetUserId from the req body
-  const { targetUserId } = req.body;
+chatRouter.post("/chat/:targetUserId", userAuth, async (req, res) => {
+  //* receiving  targetUserId from the path parameters (Url params /:targetUserId ) dynamically as for every chat targetUserId can be different
+    const { targetUserId } = req.params;
 
-  const userId = req.user._id;
-
-  try {
     //* finding the existing chat so we can return the past messages
     const chat = await Chat.findOne({
       participants: { $all: { userId, targetUserId } },
@@ -1914,7 +1918,8 @@ module.exports = chatRouter;
 */
 
 //****frontend */
-//* now in the frontend we have to call this api and get the past messages to display on frontend.
+//! fetchChatMessages function (read below note 1 and 2(specially))
+//* now in the frontend we have to call this api and get the past messages to display on frontend. (1. after some days we also added chatTimeStamp feature , so we also added some code in this fetchChatMessages function so to see it we have to search in this file , "ChatTimeStamp Feature in Past messages(in fetchChatMessage function) and new messages ("messageReceived event in useEffect hook") & (2.we improved fetchChatMessages function further to also use it for fetching limited messages on initial render and then on click of a "load previous messages" button to render more previous messages to see search "Limiting messages when fetching messages from database using fetchChatMessages function")
 //* like below:-
 /*
   const fetchChatMessages = async () => {
@@ -2024,6 +2029,8 @@ module.exports = chatRouter;
     </div>
     */
 
+//!  ///////////////////
+//! Previous implementation of scrollToBottom when new message gets added(after new implementation we removed this one , to see new one search:- "New implementation of scroll to bottom when new message gets added")
 //* to automatically scroll the chat messages portion to view new message so user don't need to scroll every time we are displaying a new message gets added by user, or other user sends a new message.
 //* in the top we created a useRef for reference , and created a useEffect hook which will be called whenever messages state variable update like below:-
 /*
@@ -2075,8 +2082,11 @@ useEffect(() => {
               );
             })}
           </div>
-/*
+
 */
+
+//! /////////////////////////
+
 //////////////////*backend******************
 //* in the the sendMessage event written in utils/socket.js (backend) we also authentication check to check if both users are friends are not , otherwise two user who are not friends but can also do chat , so we added this authentication,  we will check if both users are friends are not by finding the accepted status between two users user using connection request model , and while doing the query we have to check using $or query because loggedInUser can be either the fromUserId or targetUserId and same for other side user:-
 //* in backend utils/sockets.js inside send message event function
@@ -2238,7 +2248,452 @@ useEffect(() => {
 </p>;*/
 //* add comments for the chat timestamps formatting function, both for previous received messages and new added messages receiving through messageReceived event.
 //! getFormattedLastSeen() function
-//* and above we can see a getFormattedLastSeen function , so inside the utils folder we added a file lastSeenTimeAgo.js file and inside it , we added getFormattedLastSeen() function because from backend lastSeen is coming 2026-01-01T06:46:23.640Z format , because saved it in the database in js date format using new Date() function , but while showing the lastSeen on Ui we wanted for TODAY: Show "5 minutes ago" format , YESTERDAY: Show "yesterday" format, for within THIS YEAR (but more than 1 day ago): Show "24 Oct" format without showing the year,MORE THAN A YEAR AGO: Show "24 Oct, 24" format with showing the year and then we exported the function , and imported it in chat.js file and then used where we showing the last seen on the ui .
+//* and above we can see a getFormattedLastSeen function , so inside the utils folder we added a file lastSeenTimeAgo.js file and inside it , we added getFormattedLastSeen() function because from backend lastSeen is coming 2026-01-01T06:46:23.640Z format , because saved it in the database in js date format using new Date() function , but while showing the lastSeen on Ui we wanted for TODAY: Show "5 minutes ago" format , YESTERDAY: Show "2.37 pm, yesterday" format, for within THIS YEAR (but more than 1 day ago): Show "9.29.pm, 24 Oct" format without showing the year,MORE THAN A YEAR AGO: Show "24 Oct, 24" format with showing the year(not showing time as it was more than a year ago) and then we exported the function , and imported it in chat.js file and then used where we showing the last seen on the ui .
+
+//! ChatTimeStamp Feature in Past messages(in fetchChatMessage function) and new messages ("messageReceived event in useEffect hook")
+//* Previously we were not adding accurate chatTimeStamp , now we will add accurate time Stamp to show in the Ui ,
+//!1.  so first in fetchChatMessages function where we are fetching the old chat messages
+//* there we are receiving the whole chat with all the messages including the createdAt time , and this createdAt time is in utc format as backend directly sending the chat data without converting it to Ist format, , so inside the fetchChatMessages function to format the data we have written a map method inside which we are formatting the data, so as the chat.data.messages has all the messages data so we are using map method on it, and the from each messages obg we are extracting the senderId to get the firstName and lastName as senderId is referenced with userSchema , and text to get the messages , and createdAt which has the timing of the message in Utc format , the we are converting it to date using new Date() , then we are converting it istFormat so we can get a 30/12/2025, 01:27 pm kind of output, now on the Ui , we directly do not want to show the time and date side by side , it looks ugly, and also if the date is today's date then we want to show "today"  as the date value, if the date is yesterday's date then we want to show "yesterday" as date value , if the date is with in this year then we want to show date in "30 Dec" format without the year and if the date is not with in this year then we want to show "30 Dec,24" format with the year ,so we in the utils folder we have added a chatTimeStampFormater.js file and written a function named formatChatTimestamp and exported it and then used it to get the expected date and time and then return a object for message which has the firstName ,lastName , text, time, date, like below:-
+/*
+    const chatMessages = chat?.data?.messages.map((msg) => {
+      const { senderId, text, createdAt } = msg;
+
+      //* to convert time utc format to indian format, while fetching old messages and when we are live sending messages then we will just display current time and not data because obviously it will be current day, so only showing current time is enough
+      const utcTimeString = createdAt;
+      const date = new Date(utcTimeString);
+      const istFormatTime = date.toLocaleString("en-IN", {
+        timeZone: "Asia/Kolkata",
+        year: "numeric",
+        month: "2-digit",
+        day: "2-digit",
+        hour: "2-digit",
+        minute: "2-digit",
+        hour12: true, // Set to false if you want 24-hour format
+      }); //* Example Output: "30/12/2025, 01:27 pm"
+      //////////////////*
+      const { date: formattedDate, time: formattedTime } =
+        formatChatTimestamp(istFormatTime);
+      console.log(formattedDate);
+
+      return {
+        firstName: senderId?.firstName,
+        lastName: senderId?.lastName,
+        text: text,
+        time: formattedTime,
+        date: formattedDate ,
+      };
+      */
+//! 2.  second where we adding  new messages listening the messageReceived event("messageReceived event in useEffect hook")
+//* so when we send a new message , then a sendMessage event gets emitted and backend listens for that event then if first backend check if both users are friend , then after that it finds the previous chat from database, and push the new message into the chat, then after that we were directly sending emitting the messageReceived event and sending the firstName,lastName , and text , but in the frontend as we also want the date and the timing of the newly sent message , so to do that while saving the messages into the db we received the the saved message object from the database so we can get the timing  ,like below:-
+/*
+*(in backend utils/socket.js inside sendMessage event)
+  const newMessageTiming =
+            savedChat.messages[savedChat.messages.length - 1].createdAt;//* length -1 is to get the last message which will be the new messages we just saved
+      io.to(roomId).emit("messageReceived", {
+   firstName,
+   lastName,
+   text,
+   newMessageTiming,
+ });
+  \ */
+//* then so as we retrieving directly from the chat so , now it is not giving it in utc format , instead it is already giving it in ist format, so while emitting the messageReceived event , we are also sending the newMessageTiming, then we are receiving it on the frontend and then again we are formatting the istTiming into 30/12/2025, 01:27 pm from  this format , Jan 05 2026 20:44:29 GMT+0530 (India Standard Time),returned from backend , then again we used     formatChatTimestamp(istFormatTime) function , to get the formatted time and date as we want  if the date is today's date then we want to show "today"  as the date value, if the date is yesterday's date then we want to show "yesterday" as date value , if the date is with in this year then we want to show date in "30 Dec" format without the year and if the date is not with in this year then we want to show "30 Dec,24" format with the year, then we used this date , time, firstName,lastName, text, to create a message object and added this message to messages array after the previous messages.
+/*  
+*(in frontend chat.jsx, where receiving the messageReceived event)
+  socket.on(
+       "messageReceived",
+       ({ firstName, lastName, text, newMessageTiming }) => {
+         const date = new Date(newMessageTiming); //* converting time string to readable format
+         const istFormatTime = date.toLocaleString("en-IN", {
+           timeZone: "Asia/Kolkata",
+           year: "numeric",
+           month: "2-digit",
+           day: "2-digit",
+           hour: "2-digit",
+           minute: "2-digit",
+           hour12: true, // Set to false if you want 24-hour format
+         }); //* Example Output: "30/12/2025, 01:27 pm"
+         const { date: formattedDate, time: formattedTime } =
+           formatChatTimestamp(istFormatTime);
+         //////////////////*
+         isHistoryLoading.current = true;
+           //* this is how we add a new message after the already present messages , this is  how we are receiving already present messages below - (messages)=> and then as it is a array so inside the array we are spreading already present ...messages(array of objects) inside the array and after that we are adding the new messages object inside the array, basically we are appending the new message object at last.
+         setMessages((messages) => [
+           ...messages,
+           {
+             firstName,
+             lastName,
+             text,
+             time: formattedTime,
+             date: formattedDate ? formattedDate : null,
+           },
+         ]);
+         console.log(messages);
+       }*/
+
+//! Limiting messages when fetching messages from database using fetchChatMessages function
+//* previously we were only using the fetchChatMessages function to load all the previous chats, but when chat grows and it has 1000s of messages , so fetching all the previous chats messages is not necessary, it creates unnecessary pressure on the database and we are also fetching unnecessary too much data on frontend because , every time the user opening the chat it is not necessary that every time the user will see all the previous chats, so now , we will not fetch all the chat messages instead we will fetch only few messages like 30 or 50 messages in the initial load so when the user coming back and opening the chat page, and the chat component mounts , it will only fetch few messages at the initial load , and if the user scroll to top and reaches to the top then we will display a "Load previous messages" button , on click of of this button again it will fetch again few messages, and same will happen again and again until the user reaches to the first message of the chat. So lets start the implementation,  first we have to do some changes in the backend "/chat/:targetUserId" api , so it can only send limited messages at a time not all messages, so from the frontend we will send two query params one is skip and one is limit, skip will track how may message it has to skip every time the user is loading more previous message, and limit will determine how many messages it has send in every api call :-
+//* backend (in routes/chat.js )
+//*  /chat/:targetUserId api changes (with all explanation of implementation)
+/*
+const express = require("express");
+const { Chat } = require("../models/chat");
+const { userAuth } = require("../middlewares/auth");
+
+const chatRouter = express.Router();
+
+//* api to send previous chat messages between two specific users
+chatRouter.get("/chat/:targetUserId", userAuth, async (req, res) => {
+  //* receiving  targetUserId from the path parameters (Url params /:targetUserId ) dynamically as for every chat targetUserId can be different
+
+  const { targetUserId } = req.params;
+  console.log(targetUserId + " from chat");
+
+  const userId = req.user._id;
+  console.log(userId);
+
+  //* implementation of sending limited messages to frontend(also we can say kind of pagination)
+  //* getting the skip and limit value from query parameters(Query Strings ?skip=value&limit=value)
+
+  const { limit = 50, skip = 0, displayedMessages = 0 } = req.query; //* default value skip 0 , and limit = 50 , if no query params are passed, so it will skip no messages , and give last 50 messages because limit is set to 50 as default
+  console.log(displayedMessages + " displayedMessages On Ui");
+  const parsedLimit = parseInt(limit); //* parsing limit to integer from string
+  const parsedSkip = parseInt(skip); //* parsing skip to integer from string
+  console.log(parsedSkip + "skip & limit " + parsedLimit);
+
+  //* To check total number of messages in db (if not exist any it will not through any error instead it will just set messageCountInDb value to 0)
+  const chatInfo = await Chat.findOne({
+    participants: { $all: [userId, targetUserId] },
+  });
+
+  const messageCountInDb = chatInfo ? chatInfo.messages.length : 0;
+  //* console.log("message count " + chatInfo.messages.length);
+  
+  //* Logic for calculating the sliceRange according to the skip and limit value:
+  //* skip=0 & limit=50  -> slice: [-50] (Last 50 messages)
+  //* skip=50 & limit=50 -> slice: [-100, 50] (Next 50 older messages after skipping last 50) 
+   * (so when skip is passed 50 , and limit is passed 50 , then we are doing [-(skip+limit),limit]= [-(50+50),50] = slice[-100,50]  start slicing the array from last 100 and then give 50 , that's why we can get 50 messages after skipping last 50 , so slice(start,end) so first param is where the slicing starts , and second is for how much is number of slice we need , so after how many objects the slicing will stop)
+  //*  when skip= 10 & limit=20 => slice[-(10+20),20] => slice[-30,20] (so we can skip last 10 messages,and get 20 messages before it because slicing will start from -30 and stop after 20  )
+  //* skip=100 & limit=50 -> slice: [-150, 50] (Next 50 older messages after skipping 100)
+  
+   
+  //* sliceRange  is a array which will passed inside slice("messages",sliceRange) method, to slice messages array according to the skip and limit we will get from the frontend, in slice() method normally first param is where the slicing starts , and second is for how many indexes it will slice. in this case while we will do the query mentioning the messages is necessary as messages will be present inside chat object as messages property,so in this case the "messages" will be first param and then second param will be the sliceRange array where first index  is where the slicing starts(as we want to get latest messages first, so we have to start the slicing using negative value that's why sliceRange array's first index will be a negative value always to get the indexes from last like -50 to start slicing from last 50 index) , and second index is for how many indexes it will slice(like if value is 20 and it will start slicing from last 50 th(-50) index and slice 20 indexes).
+  let sliceRange; //*
+  if (parsedSkip === 0) {
+    //*for initial load :- when skip=0  -> slice: -50 (Last 50 messages)
+    sliceRange = -parsedLimit;
+  } else if (parsedSkip + parsedLimit >= messageCountInDb) {
+    //* when skip value exceeds total messages available in database(as first value of slice method is where the slicing gets started which we calculate by adding the skip and limit, so when the starting value of slice method exceeds the or equals to the message count on the database, then we will subtract the skip value from the total message count on database , to get the number of remaining messages)
+    const remainingMessages = messageCountInDb - parsedSkip;
+    console.log(remainingMessages + "remaining messages");
+    //* now the sliceRange array's first index will be skipped + remainingMessages , so the indexing can start from exactly how many messages are remaining, (so if skip=100 , limit= 20 , remaining messages=4(104-100) , then first index of slice range array will be -(skip+remainingMessages) =  -(100+4) = -104 to start slicing 104th last message(-104)),  and then second index is remainingMessages(4 to slice only 4 indexes from last 104th(-104) message ) , so it can only send the remaining messages as second index is for how many indexes it will slice.
+    sliceRange = [-(parsedSkip + remainingMessages), remainingMessages];
+  } else {
+    //* this else block will be executed when it is neither the initial api call ,nor the case when remaining messages not sent to frontend are less than the skip+limit we get from frontend(above case), so basically it is in between case.
+    //* in this case first sliceRange array's first index will be -(skip+limit) , so if the skip is 100 and limit is 20 then , slicing can start from -120 and second index will limit , so from the last 120 th(-120) index it can slice 20 indexes only.
+    //* In sliceRange 1st index value to Start slicing from -(skip + limit) from the end as it is negative value, and second index is limit to slice only indexes we got as limit.
+    sliceRange = [-(parsedSkip + parsedLimit), parsedLimit];
+    console.log("sliceRange" + sliceRange);
+  }
+
+  console.log("SliceRange" + Array.isArray(sliceRange));
+
+  try {
+    //* finding the existing chat so we can return the past messages
+    let chat = await Chat.findOne({
+      participants: { $all: [userId, targetUserId] },
+    })
+      .slice("messages", sliceRange)
+      .populate({
+        path: "messages.senderId",
+        select: "firstName lastName",
+      });
+    //* populating firstName lastName, same as writing :- .populate("messages.senderId","firstName lastName");
+    //*.slice("messages", sliceRange) is for Apply the dynamic slice ( to only send messages according to the skip and limit we get from frontend - logic explained where sliceRange array is created, slice("messages" is the path of array we want o slice  messages array which will be present inside the chat object like object.messages , and sliceRange is the array where first index will the index from which slicing will start , and as we want the latest messages , so this first index will be a negative value  to  start the slicing from the last end of the messages array and second index of sliceRange will be the the limit , so basically how many indexes we want to slice, for example - we have total 300 messages in messages array,and sliceRange is [-100,50] then it will calculate starting point of slicing from the last of the array so -100 means it will start from (300 - 100)= 200 th messages(for -100 ,first index in sliceRange) , and for slice till 250 th message index ( for 50 ,second index in sliceRange)  ))
+
+    //* if there is no past  then we  messages  can create a new chat and send it to frontend
+    if (!chat) {
+      chat = new Chat({
+        participants: [userId, targetUserId],
+        messages: [],
+      });
+    }
+    // console.log("new" + chat);
+    //* saving chat
+    await chat.save();
+    //* sending the past chat (if existed ) or new empty chat(if there is no new previous chat)
+    res.json(chat);
+  } catch (err) {
+    res.status(400).json({ message: "something went wrong:- " + err.message });
+  }
+});
+
+module.exports = chatRouter;
+*/
+
+//* now the frontend implementation in chat.jsx file
+//* previously we were only fetching the whole old messages data  on chat component mounting using the fetchChatMessages function as we were just calling this function using useEffect hook with empty dependency array to call it only once on the initial component mount, then we were not passing any parameter into the function , and also not passing any skip or limit query params to fetch limited messages, we were just calling the function and inside it directly calling the api without passing skip or limit , and after getting the response we formatted the data and then updating the messages array with the chat Messages, but as we are now implementing the limited messages fetching feature , that's why we have to do some changes on the fetchChatMessages function, so as we already did changes on the backend api, , so first we will create a skip state variable , so we can track how many messages we have to skip , every time we are fetching old messages, So the plan is that in the initial api call we will just fetch last 30 messages(latest) , and at the top of 30 messages there will be a button named "Load Previous Messages" , when this button will be clicked , then again we will fetch more 30 messages , and this will happen till we fetched all the messages , if all the messages are fetched , then we will also keep another state variable named hasMore, so initially it's default value will be true and till it's true we will show the "Load Previous Messages" button and when all messages are fetched, then we will set this hasMore state variable's value to false , and when it's value will be false we will show "Starting of the chat" instead of "Load Previous Messages" button. So first we will create the skip state variable, and limit constant and set both values to 30, and then also a state variable hasMore and its initial value to true,and then we will create , scrollRef using useRef hook , keep track of the scroll position of the of the chat messages container and also mention  this scrollRef as the value of ref property of the div which is containing the all of the messages, then we will create previousScrollHeightRef hook using ureRef hook  to maintain Scroll Position without scrolling after Prepending History on click  of "Load Previous Messages" button, and also create a isHistoryLoading using ureRef hook  its initial value will be false,to track if we are prepending history on click of "Load Previous Messages" button , because when we will prepend history on click of the "Load Previous Messages" button, then will not scroll to bottom , because scroll to bottom should happen when new message gets added or it is initial chat load, so using this isHistoryLoading ref , we will do the scrolling , so when we will prepend history on click of the "Load Previous Messages" button we will set this ref value to true , and when its value will be true we will not do the scroll bottom.
+
+//*1. now in the fetchChatMessages function we will add two parameters, first is currentSkip  and second is isInitial and its  default value will be true, this first parameter currentSkip is for passing the skip value ,so we will pass it as a parameter , so for the initial load we can always pass the currentSkip value as 0 and isInitial  as true, but onClick of "Load previous messages" button we will call this fetchChatMessages function with currentSkip value as the skip state variable which we will update every time we will load more previous messages, and isInitial as false because it is not the initial load, now inside the fetchChatMessages function we will call the api with passing the skip and limit as query params , then we will get the response and format the response , so for every message we will create a object which will contain the firstName ,lastName,text,time,date. and all the messages we will save inside chatMessages array,
+//* now before doing anything, first we will check if the returned chatMessages array has less messages than the LIMIT we passed or not, because if it return less messages than the set limit then it means in database there are no more messages that's why the api returned less messages than the LIMIT value we passed , so in this case we will set hasMore state variable value to false , so using it we can hide the "Load previous messages" button and show "Start of the chat" on the ui. then we will check isInitial params received value , if it is true , then it is the initial load then we will normally , set the messages state variable value to chatMessages using setMessages function, but when isInitial value is false , then that means the api is called for loading chat history so we have to prepend messages before the messages already present in the chatMessages array, so in this case first we will set isHistoryLoading.current to true , so while we will prepend the history then scroll to bottom does not happen, then before prepending the messages we have to keep the track of the scroll height , so after prepending messages the scroll position does not change, so we will save the current scrollHeight by setting previousScrollHeightRef.current to scrollRef.current.scrollHeight ; as scrollRef is referenced to the chatContainer , and then to understand better we will save the chatMessages value to a constant named newLoadedChatHistory, and then finally we will prepend messages before the already present messages :-     setMessages((prev) => [...newLoadedChatHistory, ...prev]); and then we will update the skip state variable value .
+
+//* now outside the fetchChatMessages function , we will use useEffect hook with empty dependency array to call it on the component mount just once, and inside it we will call the fetchChatMessages(0,true), as it is for initial load the currentSkip will be 0 and isInitial value to true.
+
+//*2. then  to maintain the scroll position after prepending history, we will use a useLayoutEffect hook with dependency array which will have messages state variable as dependency to call it when messages array updates,  because this hook is a specialized version of useEffect designed for side effects that must happen synchronously before the user sees anything on the screen, so we can maintain the scroll position before event previous messages gets shown to the ui.
+//* so inside this hook, we will check we are prepending the history, if it value is true , and scrollRef.current is present , as it has the reference of the div container , which is rendering all of the messages , because we will need the scrollHeight of the div container to maintain the scroll position , so when both conditions match then we will save the div container reference into a container constant, and calculate how much the height increased and adjusting scroll position, so the user sees the same scroll position in the chat even after prepending old messages :- container.scrollTop = container.scrollHeight - previousScrollHeightRef.current;
+
+//*3. then we will write a scrollToBottom function , which will scroll the messages containing container to the bottom , and then after writing the function we will write a useEffect hook with dependency array which will have messages state variable as dependency to call it when messages array updates, then inside this we will only call this scrollToBottom function , either it is initial chat component mount and we are loading chat messages (not prepending history) or we are adding a new message , so basically when isHistoryLoading.current has false value.
+
+//* so step by step code for all of this with explanation is below:-
+/*
+  //* (1. function to load previous chats ,2.Maintain Scroll Position after Prepending History, 3. New implementation of scroll to bottom when new message gets added )
+
+  //* skip state variable to send the messages skip value , depending on this skip value and LIMIT constant value ,we will fetch the chat history , also for initial chat load and also for when user will click on "Load Previous Messages" button.
+  const [skip, setSkip] = useState(30); //* while fetching messages in the initial component mount we will  manually pass the  skip  value as 0 , inside a useEffect with empty dependency array to call it when ever the chat component loads first time to fetch the chat messages, but when but first history load will happen then the skip should be 30 to skip first 30 messages which are already fetched in the previous call, and in every call of fetchChatMessages function we will also update the skip value by adding the currentSkip+LIMIT , currentSkip is parameter of fetchChatMessages function .
+  const LIMIT = 30; //* to set the number of messages we want to fetch in single chat api call.
+  const [hasMore, setHasMore] = useState(true); //* To track either any messages are remaining to fetch or not, initially it will be true , so we can display the "Load Previous Messages" button , to load more messages , but whenever the chat api call will happen either in the initial component mount or while prepending the history on click of the button, every time we will check , if the returned chat messages array length is shorter that LIMIT we passed on the api call, if it is shorter that means there are no more messages remaining the db to fetch, so we will set this hasMore state variable's value false , because database has no more messages to send , and when hasMore's value is false , we will display at the top that it is the "starting of the chat" instead of  "Load Previous Messages" button .
+
+  const scrollRef = useRef(null); //* to keep track of chat container , so scroll bottom can happen when new messages gets added into chat container, and also to  maintain Scroll Position without scrolling after Prepending History(both scrollRef and previousScrollHeightRef declared below will be used to maintain it )
+  const previousScrollHeightRef = useRef(0); //* to maintain Scroll Position without scrolling after Prepending History on click  of "Load Previous Messages" button
+  const isHistoryLoading = useRef(false); //* to track if we are prepending history on click of "Load Previous Messages" button, if we are prepending history then we will set it to true , because when it will be true , in that case we will not do scroll bottom of the container as it is not required, but in other case , as it will be false then only scroll bottom can happen because that case will either the adding of new message or initial chat load which happens on chat component mount.
+
+  //*1. function to load previous chats
+  const fetchChatMessages = async (currentSkip, isInitial = true) => {
+    console.log(currentSkip);
+    const chat = await axios.get(
+      BASE_URL +
+        "/chat/" +
+        targetUserId +
+        "?skip=" +
+        currentSkip +
+        "&limit=" +
+        LIMIT,
+      {
+        withCredentials: true,
+      }
+    );
+    console.log(chat.data);
+
+    const chatMessages = chat?.data?.messages.map((msg) => {
+      const { senderId, text, createdAt } = msg;
+
+      //* to convert time utc format to indian format, while fetching old messages and when we are live sending messages then we will just display current time and not data because obviously it will be current day, so only showing current time is enough
+      const utcTimeString = createdAt;
+      const date = new Date(utcTimeString);
+      const istFormatTime = date.toLocaleString("en-IN", {
+        timeZone: "Asia/Kolkata",
+        year: "numeric",
+        month: "2-digit",
+        day: "2-digit",
+        hour: "2-digit",
+        minute: "2-digit",
+        hour12: true, // Set to false if you want 24-hour format
+      }); //* Example Output: "30/12/2025, 01:27 pm"
+      //////////////////*
+      const { date: formattedDate, time: formattedTime } =
+        formatChatTimestamp(istFormatTime);
+      console.log(formattedDate);
+
+      return {
+        firstName: senderId?.firstName,
+        lastName: senderId?.lastName,
+        text: text,
+        time: formattedTime,
+        date: formattedDate ? formattedDate : null,
+      };
+    });
+    //* when we will fetch old messages using the "Load Previous Messages" button , then if the returned response contains less messages than the Limit we set then setting hasMore State variable to false, and using this hasMore state variable , we will Show In Ui that it is the begging of the messages, otherwise we will show the "load previous messages button".
+    if (chatMessages.length < LIMIT) setHasMore(false);
+    console.log(chatMessages);
+    //* adding all chat messages to the state variable
+    // setMessages(chatMessages);
+
+    if (isInitial) {
+      //* initial chat messages loading block{}
+      // console.log("IsInitial");
+      setMessages(chatMessages);
+    } else {
+      //* PREPEND history block{}
+      // console.log("prepending");
+      //* setting isHistoryLoading ref value to true so scroll does not happen we will prepend history on click of "Load Previous Messages" button
+      isHistoryLoading.current = true;
+      //* keeping track of container scroll position before prepending messages , so after prepending messages the scroll position can be same (implementation inside the useLayoutEffect() hook below)
+      previousScrollHeightRef.current = scrollRef.current.scrollHeight;
+      // console.log(isHistoryLoading.current);
+      const newLoadedChatHistory = chatMessages; //* when fetchChatMessages function is called by clicking on Load Previous messages button, then the value of chatMessages will the be the old messages that's why this else block is triggered,and for understand it better we saved the old messages into a constant first then below we prepended old messages before the already present messages
+
+      //* this is how we prepend newLoadedChatHistory messages before the already present messages , this is receiving already present messages below - (messages)=> and then as it is a array so inside the array we are spreading ...newLoadedChatHistory(array of objects)  and after that we are spreading already present messages(array of objects) in the array, basically we are prepending the ...newLoadedChatHistory messages (objects)  before already present messages (objects) .
+      setMessages((prev) => [...newLoadedChatHistory, ...prev]);
+    }
+    //* updating the skip the value
+    setSkip(currentSkip + LIMIT); //* currentSkip value is parameter of this function , LIMIT is the constant we are using to tell backend how many messages it should send, we are also using LIMIT and currentSkip value to update the skip value after every fetchChatMessages function call.
+    // console.log(user?.data?.firstName);
+  };
+
+  //* useEffect with empty dependency array to call it when ever the page loads first time to fetch the chat messages.
+  useEffect(() => {
+    fetchChatMessages(0, true);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+  //* 2. Maintain Scroll Position after Prepending History
+  useLayoutEffect(() => {
+    //* notes also added for useLayoutEffect hook in allLessonNotes file
+    if (isHistoryLoading.current && scrollRef.current) {
+      const container = scrollRef.current; //* the div container containing all of the messages , as we require the scroll height from this container.
+      console.log(container);
+      console.log(
+        "previousScrollHeightRef.current" + previousScrollHeightRef.current
+      );
+      //* Calculating how much the height increased and adjusting scroll position, so the user sees the same scroll position in the chat even after prepending old messages.
+      container.scrollTop =
+        container.scrollHeight - previousScrollHeightRef.current;
+      console.log("container scroll top" + container.scrollTop);
+    }
+  }, [messages]);
+
+  //* 3.New implementation of scroll to bottom when new message gets added or initial chat load:- Auto-Scroll to Bottom when new messages gets added or initial chat load(not when we are prepending  history gets loaded onClick of "Load previous messages") button
+  const scrollToBottom = (behavior = "smooth") => {
+    if (scrollRef.current) {
+      scrollRef.current.scrollTo({
+        top: scrollRef.current.scrollHeight,
+        behavior,
+      });
+      // console.log("scrollToBottom called");
+    }
+  };
+  useEffect(() => {
+    //* If we aren't prepending history( when isHistoryLoading.current has false value that's why in below condition we mention not! operator),we are assuming this change as adding a NEW message and doing the scroll or it is a initial chat load.
+    // console.log("ishistoryloading " + isHistoryLoading.current);
+    if (!isHistoryLoading.current) {
+      scrollToBottom("smooth"); //* only gets called either it is initial chat component mount and we are loading chat messages (not prepending history) or we are adding a new message .
+    }
+  }, [messages]);
+
+*/
+
+//! WebSocket Auth implementation( websocket authentication)
+//* so till now we built all the features using socket io , but our for security purpose , we should implement authentication because implementing Socket.IO without authentication  leaves our real-time application open to several critical security and operational risks. By default, Socket.IO does not provide native authentication, meaning anyone who can point a client at your server can establish a connection and begin interacting with your events.
+//* The following are the primary consequences of omitting authentication:
+//* 1. Unauthorized Access and Data Exposure
+//* Access to Sensitive Events: Without identity verification, any client can join rooms or listen to broadcast events that may contain private user data or sensitive business information.
+//* Impersonation: Attackers can emit events while spoofing identifiers (e.g., a userId), allowing them to perform actions on behalf of other users, such as posting messages or modifying account settings.
+//* 2. Cross-Site WebSocket Hijacking (CSWSH)
+//* Bypassing Same-Origin Policy: Unlike standard HTTP requests, WebSockets are not restricted by the browser's Same-Origin Policy (SOP). If your server relies only on cookies for authentication, a malicious site can initiate a Socket.IO connection in a victim's browser, automatically including their session cookies to hijack the connection.
+//* 3. Vulnerability to Denial of Service (DoS)
+//* Resource Exhaustion: Unauthenticated users can flood your server with numerous connection requests, overwhelming system resources and preventing legitimate users from accessing the service.
+//* No Way to Block Malicious Clients: Without an authentication layer (like middleware), you cannot easily filter or disconnect malicious actors before they consume significant server processing power.
+//* 4. Injection Attacks and Logic Flaws
+//* Malicious Payloads: Unauthenticated clients can send specially crafted packets to trigger unhandled exceptions, potentially crashing your Node.js process (e.g., CVE-2024-38355).
+//* Broken Access Control: Lack of authentication often reveals missing authorization checks, where users can execute privileged functionality they should not have access to.
+//* 5. Inability to Audit and Monitor
+//* Loss of Accountability: Without establishing a user's identity, you cannot log or audit activities effectively. This makes it impossible to detect the source of an attack or identify which accounts have been compromised after a breach.
+//* To mitigate these risks , it is standard practice to use Socket.IO middleware to verify tokens (such as JWT) during the initial connection handshake.
+
+//* So let's implement authentication , using the jwt token we already received from backend , which is present inside our browser cookies, so first we will access the token from the browser cookies, so as when we will create the socket connection with the backend then we have to send the token , so in frontend we will go to utils/socket.js , where we have written createSocketConnection() function , so above the function we will a function to access the cookie from the browser , so this function will receive the specific cookie name we want to access as we want to access the token. and then we will access the token by calling this function and passing "token" as argument and we will save the returned token into a token constant, and then inside the createSocketConnection function we will pass this token as the second argument of io(backendUrl,{auth:{token:token}},) function. and also send the credentials , which will also send the token through cookies, so we will receive the token in two ways, one through auth and another through the cookies, code:-
+/*
+* in frontend utils/socket.js
+import { io } from "socket.io-client";
+import { BASE_URL } from "./constants";
+
+//* function to get specific cookie using the name as we want the token, not other cookies, or we can also use third party libraries like js-cookie or react-cookie.
+const getCookie = (name) => {
+  const value = `; ${document.cookie}`;
+  const parts = value.split(`; ${name}=`);
+  if (parts.length === 2) return parts.pop().split(";").shift();
+  return null;
+};
+const token = getCookie("token");
+
+export const createSocketConnection = () => {
+  return io(BASE_URL, {
+    auth: {
+      token: token,//* sending token through
+    },
+        withCredentials: true, // Instructs browser to send cookies/headers which will also contain the token
+  });
+};
+*/
+//* in backend , we have to verify this token we are sending , we will verify this token in utils/sockets,js where we have initialized our socket connection , so inside initializeSocket function after declaring the io, we will write a middleware which will verify the token , first by verifying the user id of the user if it is existing on the db or not,  second as we will also receive the token we sent through the cookies , so we will match the  auth token with the cookie token, and if the userID is not found in db then we will through "user not found" error and if the auth token and cookies token does not match then we will through "tokens are not matching" error . like below:-
+/*
+  //* Middleware to authenticate every new connection
+  io.use((socket, next) => {
+    //* Access token sent from client-side 'auth' object
+    const authToken = socket.handshake.auth.token;
+    // console.log(token);
+    if (!authToken) {
+      return next(new Error("Authentication error: Token missing"));
+    }
+
+    jwt.verify(authToken, process.env.JWT_SECRET, async (err, decodedObj) => {
+      // console.log("err" + err);
+      if (err) return next(new Error("Authentication error: Invalid token"));
+
+      //* Verifying if the _id if it exists in the db or not
+      const { _id } = decodedObj;
+      // console.log("id" + _id);
+      //* 1st check by verifying the id from db
+      const user = await User.findById(_id);
+      if (!user) {
+        return next(new Error("User not found"));
+      }
+
+      //* accessing the cookie token
+      const cookieString = socket.handshake.headers.cookie;
+
+      const cookies = parse(cookieString); //*  parsing cookies token
+      console.log("User ID from cookie:", cookies.token);
+      const cookieToken = cookies.token;
+      //* 2nd check if auth token match with the cookies token(received from credentials(cookies))
+      // console.log(cookieToken + " + " + authToken);
+      if (cookieToken === authToken) {
+        console.log("tokens matched");
+      }
+      //* if tokens are not matching throwing error
+      if (cookieToken !== authToken) {
+        return next(new Error("tokens are not matching"));
+      }
+
+      // console.log("id:-" + _id);
+      next();
+    });
+    //* Automatic Disconnection: When next(err) is called in the middleware, the connection is refused immediately. The connection event on the server will never fire for that specific client.
+
+    //*Reconnection Logic: By default, Socket.io might try to reconnect automatically. If the error is a permanent authentication failure (e.g., invalid token), you should manually call socket.disconnect() or socket.close() in your connect_error handler to prevent infinite retry loops.
+  });
+*/
+
+//* now when it will throw the error we have to receive the error in frontend and disconnect the connection from the frontend also , so inside chat.jsx file , inside the useEffect() where we were emitting the jointChat event in that useEffect we will listen for a event named "connect_error" event, because socket error happens it automatically emits a "connect_error" event , so in frontend we will listen for the "connect_error" event  and disconnect the socket like below:-
+/*
+//* frontend inside chat.jsx (inside useEffect created for socket connections)
+
+//* if authentication error happens then to receive error on frontend when error happens and disconnecting the socket as in
+    socket.on("connect_error", (err) => {
+      console.error("Connection Error:!", err); // "Authentication failed"
+      socket.disconnect();
+    });
+*/
+
+//* explanation of uselayouteffect() hook :-
+/*
+ * The useLayoutEffect hook is a specialized version of useEffect designed for side effects that must happen synchronously before the user sees anything on the screen.
+ * How it Works
+ * In the React rendering lifecycle, useLayoutEffect runs after React has performed DOM mutations but before the browser has a chance to paint the changes to the screen.
+ * Render: React calculates the component output.
+ * DOM Mutation: React updates the real DOM nodes.
+ * useLayoutEffect: Your code runs synchronously, potentially updating the DOM again or reading measurements.
+ * Browser Paint: The browser finally draws the result onto the screen for the user to see.
+ * When to Use It
+ * You should use useLayoutEffect only when an operation must be finished before the user sees the frame to avoid visual glitches.
+ ! Measuring DOM Elements: Calculating an element's size (width, height) or position (getBoundingClientRect) to place another element correctly, such as a tooltip or a modal or maintaining scroll position when prepending chat messages.
+ * Preventing Flickering: If you modify a style in useEffect, the user might see the old style for a millisecond before it "jumps" to the new one. useLayoutEffect ensures the user only sees the final state.
+ * Complex Animations: Synchronizing animations that depend on the exact current layout
+ * Best Practices & Caveats
+ * Performance Warning: Because it blocks the browser from painting, heavy computations inside useLayoutEffect will make your app feel slow or unresponsive.
+ * Server-Side Rendering (SSR): It does not run on the server and will trigger a warning in SSR environments (like Next.js).
+ * Default Choice: Prefer useEffect for 99% of tasks. Only switch if you notice a visual "flicker" or need precise layout measurements.*/
+
+//* difference between uselayouteffect() hook and useeffect() hook :- here ("https://bit.ly/useLayoutANDuseEffectHookDifference")
 //! adjusting footer distance
-//* the edit Profile page can have a longer height when it getting displayed on mobile, as the two side by side components  so the footer does have a very longer margin top to have longer distance required in mobile screens, and but except the edit profile component , in other components(connection, requests, feed, premium)  parent div, we have given a  negative margin because there the longer footer distance is not required
+//* the edit Profile page can have a longer height when it getting displayed on mobile, as the two side by side components  so the footer does have a very longer margin top to have longer distance required in mobile screens, and but except the edit profile component , in other components(connection, requests, feed, premium)  parent div, we have given a  negative margin because there the longer footer distance is not required.
 //! for production upload, change the constants url to actual one, before making the dist folder
+//* from the razorpay payment episode comments are present both in backend and frontend.
