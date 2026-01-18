@@ -71,7 +71,6 @@ cd Dev-Connect-Frontend
 
 ```bash
 npm install
-Use code with caution.
 ```
 
 3. Run the Application
