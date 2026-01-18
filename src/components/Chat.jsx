@@ -215,7 +215,7 @@ const Chat = () => {
       userId,
       targetUserId,
     });
-    //* receiving/listening the message other side user has sent, by receiving the emit message event
+    // * receiving/listening the message other side user has sent, by receiving the emit message event mingh
     socket.on(
       "messageReceived",
       ({ firstName, lastName, text, newMessageTiming }) => {
