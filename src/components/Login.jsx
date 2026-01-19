@@ -17,8 +17,8 @@ const Login = () => {
   const dispatch = useDispatch();
   const navigate = useNavigate();
   //* state variables to keep track what user is typing(binding state with ui components)
-  const [emailId, setEmailId] = useState("om@swami.com");
-  const [password, setPassword] = useState("OmSwami@336");
+  const [emailId, setEmailId] = useState("");
+  const [password, setPassword] = useState("");
 
   const handleLogin = async () => {
     try {
@@ -29,17 +29,17 @@ const Login = () => {
           emailId,
           password,
         },
-        { withCredentials: true }
+        { withCredentials: true },
       );
       //* setting this withCredentials to true is important to save the cookies into browser.either it will send cookies but not save in the browser.
-      console.log(data.data);
+      // console.log(data.data);
       //* dispatching action to add the returned user data to the userSlice in the redux store
       dispatch(addUser(data.data));
       //* navigating to feed(/) page
       navigate("/");
     } catch (err) {
       setError(err.response ? err.response.data.message + "!!!!" : err.message);
-      console.log(err);
+      // console.log(err);
     }
   };
   const handleSignUp = async () => {
@@ -48,17 +48,17 @@ const Login = () => {
       const data = await axios.post(
         BASE_URL + "/signup",
         { firstName, lastName, emailId, password },
-        { withCredentials: true }
+        { withCredentials: true },
       );
       //* setting this withCredentials to true is important to save the cookies into browser.either it will send cookies but not save in the browser.
-      console.log(data.data);
+      // console.log(data.data);
       //* dispatching action to add the returned user data to the userSlice in the redux store
       dispatch(addUser(data.data));
       //* navigating to profile(/profile) page
       navigate("/profile");
     } catch (err) {
       setError(err.response ? err.response.data.message + "!!!!" : err.message);
-      console.log(err);
+      // console.log(err);
     }
   };
   return (

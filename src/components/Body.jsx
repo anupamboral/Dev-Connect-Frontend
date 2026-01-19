@@ -17,7 +17,7 @@ function Body() {
       const res = await axios.get(BASE_URL + "/profile/view", {
         withCredentials: true,
       });
-      console.log(res.data);
+      // console.log(res.data);
       //* saving data in to userSlice(redux stare)
       dispatch(addUser(res.data));
       //* if the user is premium then , when we are fetching the feed data in in the first load immediately from here also we will update the premium status
@@ -31,12 +31,12 @@ function Body() {
         : null;
     } catch (err) {
       if (err.status === 401) {
-        console.log(err);
+        // console.log(err);
         //* if token is not valid then then sending the user to login page
         return navigate("/login"); //* here using return keyword is necessary , if we write return then only it will navigate to login page and stop further execution , but we don't write return then it continue the execution and execute below code , which will again redirect the user to error, and that should not happen in case of 401 unauthorized error, the below code should only execute when some other error happens like 404, 400 or any else but not 401 , so writing return is important to stop further execution
       }
       //* if any other error happens(also sending error data because in declarative mode of react router we can't use useRouterError hook )
-      console.log(err);
+      // console.log(err);
       navigate("/error", {
         state: {
           errorMessage: err.response

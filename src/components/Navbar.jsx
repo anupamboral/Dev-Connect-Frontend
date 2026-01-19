@@ -8,7 +8,7 @@ const Navbar = () => {
   const user = useSelector((store) => store.user);
   const isPremiumUser = useSelector((store) => store.premium.isPremiumUser); //! to display the premium user icon we written the condition "user.data.isPremiumUser || isPremiumUser && tick"  this is written because when the user is buying premium then premium slice slice gets updated not the user slice , but when the user is already a premium user and opening website after some days , then user slice with updated isPremiumUser will be called in the first load, so we written the condition like this , because either the user is buying the premium pack or coming after some time, in both cases the premium badge in the navbar gets displayed immediately.
 
-  console.log(user);
+  // console.log(user);
   //* to log out the user by clearing the token and cookie and redux store user data and redirecting the user to the log in page
   const navigate = useNavigate();
   const dispatch = useDispatch();
@@ -20,7 +20,7 @@ const Navbar = () => {
       {},
       {
         withCredentials: true,
-      }
+      },
     ); //* first arg is for the url, second arg {} is for body , and we are not sending any data for this api call, and third arg is for options , in this wew are setting  withCredentials:true to send the cookies and token to the server
 
     //* dispatching action to empty the user data from the redux store

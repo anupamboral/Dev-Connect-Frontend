@@ -1,5 +1,5 @@
 import axios from "axios";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { BASE_URL } from "../utils/constants";
 import { useNavigate } from "react-router-dom";
@@ -9,16 +9,26 @@ const Requests = () => {
   const navigate = useNavigate();
   const dispatch = useDispatch();
   const requests = useSelector((store) => store.requests);
+  const [showToast, setShowToast] = useState(false);
+
+  const [connectionRequestStatus, setConnectionRequestStatus] = useState(""); //* state variable to keep track of the connection request status message to show in the toast , in handleReviewRequest function after accepting or rejecting the request we will set this state variable with the response message from the api.and this state variable will be shown in the toast.
 
   const handleReviewRequest = async (status, connectionRequestId) => {
     try {
+      //* here we don't need th response
       const res = await axios.post(
         BASE_URL + "/request/review/" + status + "/" + connectionRequestId,
         {},
-        { withCredentials: true }
+        { withCredentials: true },
       );
-      console.log(res.data.data);
+      console.log(res.data);
       dispatch(removeRequest(connectionRequestId));
+      //* showing toast only for 3 sec
+      setConnectionRequestStatus(res.data.message);
+      setShowToast(true);
+      setTimeout(() => {
+        setShowToast(false);
+      }, 3000);
     } catch (err) {
       navigate("/error", {
         state: {
@@ -161,7 +171,14 @@ const Requests = () => {
               </div>
             );
           })}
-        </div>
+        </div>{" "}
+        {showToast && (
+          <div className="toast toast-top toast-center">
+            <div className="alert alert-success">
+              <span className="text-black">{connectionRequestStatus}</span>
+            </div>
+          </div>
+        )}
       </div>
     )
   );

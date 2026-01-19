@@ -78,7 +78,7 @@ const Chat = () => {
     });
     //* when we will fetch old messages using the "Load Previous Messages" button , then if the returned response contains less messages than the Limit we set then setting hasMore State variable to false, and using this hasMore state variable , we will Show In Ui that it is the begging of the messages, otherwise we will show the "load previous messages button".
     if (chatMessages.length < LIMIT) setHasMore(false);
-    console.log(chatMessages);
+    // console.log(chatMessages);
     //* adding all chat messages to the state variable
     // setMessages(chatMessages);
 
@@ -115,14 +115,14 @@ const Chat = () => {
     //* notes also added for useLayoutEffect hook in allLessonNotes file
     if (isHistoryLoading.current && scrollRef.current) {
       const container = scrollRef.current; //* the div container containing all of the messages , as we require the scroll height from this container.
-      console.log(container);
-      console.log(
-        "previousScrollHeightRef.current" + previousScrollHeightRef.current
-      );
+      // console.log(container);
+      // console.log(
+        // "previousScrollHeightRef.current" + previousScrollHeightRef.current
+      // );
       //* Calculating how much the height increased and adjusting scroll position, so the user sees the same scroll position in the chat even after prepending old messages.
       container.scrollTop =
         container.scrollHeight - previousScrollHeightRef.current;
-      console.log("container scroll top" + container.scrollTop);
+      // console.log("container scroll top" + container.scrollTop);
     }
   }, [messages]);
 
@@ -179,7 +179,7 @@ const Chat = () => {
 
     // CLEANUP: Essential to prevent status "stuck" online
     return () => {
-      console.log("useEffect unmounted");
+      // console.log("useEffect unmounted");
       socket.off("user-status-change");
       socket.off("initial-status-response");
       socket.disconnect(); // Triggers server 'disconnect'
@@ -188,13 +188,13 @@ const Chat = () => {
 
   useEffect(() => {
     //* written to see partner status state variable's value when it updates
-    console.log(partnerStatus);
+    // console.log(partnerStatus);
   }, [partnerStatus]);
   //* ////////////////////////////////////////////////////////////////
 
   useEffect(() => {
     //* written to see the updated value of messages because  In React, state updates are asynchronous and reference-based.Because setMessages is asynchronous, the value of messages will not change immediately on the very next line of code. so to see it's updated value we written this  useEffect which show the value messages get updated
-    console.log("Updated messages:", messages);
+    // console.log("Updated messages:", messages);
   }, [messages]);
   //* ////////////////////////////////////////////
 

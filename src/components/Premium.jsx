@@ -16,12 +16,12 @@ const Premium = () => {
   }, []); //* to run only once on component mount and load the premium status
 
   const verifyPremiumUser = async () => {
-    console.log("verifyUser called");
+    // console.log("verifyUser called");
     try {
       const res = await axios.get(BASE_URL + "/premium/verify", {
         withCredentials: true,
       });
-      console.log(res.data);
+      // console.log(res.data);
       if (res.data.isPremiumUser) {
         dispatch(addPremiumStatus(res.data)); //* instead of setting local state, dispatching action to update redux store, so when the user goes to another page of our website and comes back to premium page again we don't have to make api call again to check if the user is premium or not, we can just get it from the store.
         // setIsPremiumUser(true);
@@ -37,7 +37,7 @@ const Premium = () => {
       { membershipType: plan },
       { withCredentials: true }
     );
-    console.log(order);
+    // console.log(order);
 
     //* opening payment diallage box
     const { amount, currency, keyId, notes, orderId } = order.data;

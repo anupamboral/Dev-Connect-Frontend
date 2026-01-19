@@ -17,7 +17,7 @@ const Feed = () => {
       const res = await axios.get(BASE_URL + "/user/feed", {
         withCredentials: true,
       });
-      console.log(res);
+      // console.log(res);
       //* adding data to the store(feedSlice)(when there is no new user is found and api responded empty array them setting the feed state to null which will show no new users found message)
       res.data.data.length === 0
         ? dispatch(addFeed(null))
@@ -32,7 +32,7 @@ const Feed = () => {
           errorState: err.response ? `Status ` + err.response.status : err.code,
         },
       });
-      console.error(err.message);
+      // console.error(err.message);
     }
   };
 

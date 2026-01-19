@@ -2697,3 +2697,51 @@ export const createSocketConnection = () => {
 //* the edit Profile page can have a longer height when it getting displayed on mobile, as the two side by side components  so the footer does have a very longer margin top to have longer distance required in mobile screens, and but except the edit profile component , in other components(connection, requests, feed, premium)  parent div, we have given a  negative margin because there the longer footer distance is not required.
 //! for production upload, change the constants url to actual one, before making the dist folder
 //* from the razorpay payment episode comments are present both in backend and frontend.
+
+//! page not found problem while we refreshing in other page(connections page , chat page )  solution (in frontend)
+//* This error occurs because your web app is a Single Page Application (SPA) (using React, Vue, Angular, etc.). In an SPA, routing is handled on the client side by JavaScript, but when you enter a URL like /profile directly or refresh the page, Netlify's server looks for a physical file named profile or profile.html. Since that file doesn't exist, it returns a 404 error.
+//* To fix this, you must tell Netlify to redirect all requests to your index.html so your JavaScript router can take over. You can do this using one of two methods:
+//! Method 1: The _redirects file (Recommended and used in this project)
+//* This is the simplest method. Create a file with no extension and place it in your project's public folder (e.g., /public/_redirects).
+//! Create a file named _redirects in your public(folder present in this project) directory.
+//! Add the following line to the file:- "  /*  /index.html  200  "
+//*  -------
+//* Method 2: The netlify.toml file
+//* If you prefer a structured configuration file, create a netlify.toml file in your project's root directory (the same folder as your package.json).
+//* Create a file named netlify.toml in the root folder.
+//* Add the following code inside the netlify.toml file:
+/*
+[[redirects]]
+  from = "/*"
+  to = "/index.html"
+  status = 200 
+  */
+
+//! toast feature in request.jsx file after accepting or rejecting a request
+//* so to show a toast notification after accepting or rejecting a request, we have created a connectionRequestStatus state variable, and inside the handleReviewRequest function after getting the response from the api  , we are saving the response message into this state variable , then using this state variable we are showing the toast notification using a setTimeout function for 3 sec. we will show the toast notification with the updated message,
+//*outside the handleReviewRequest function
+//*const [connectionRequestStatus, setConnectionRequestStatus] = useState("");
+//inside the handleReviewRequest function after getting the response from the api:-
+/*
+//* in request.jsx
+   const res = await axios.patch(
+        BASE_URL + "/profile/edit",
+        {
+          firstName,
+          lastName,
+          age,
+          about,
+          skills,
+          photoUrl,
+          gender,
+        },
+        { withCredentials: true },
+      );
+      dispatch(addUser(res.data));
+      //* showing toast only for 3 sec
+      setShowToast(true);
+      setTimeout(() => {
+        setShowToast(false);
+      }, 3000);*/
+
+//* state variable to keep track of the connection request status message to show in the toast , in handleReviewRequest function after accepting or rejecting the request we will set this state variable with the response message from the api.and this state variable will be shown in the toast.

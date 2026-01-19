@@ -10,13 +10,13 @@ const Connections = () => {
   const navigate = useNavigate();
   const dispatch = useDispatch();
   const connections = useSelector((store) => store.connections);
-  console.log(connections);
+  // console.log(connections);
   const fetchConnection = async () => {
     try {
       const res = await axios.get(BASE_URL + "/user/connections", {
         withCredentials: true,
       });
-      console.log(res);
+      // console.log(res);
       dispatch(addConnections(res.data.data));
     } catch (err) {
       navigate("/error", {
