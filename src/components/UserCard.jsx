@@ -8,7 +8,7 @@ const UserCard = (props) => {
   const navigate = useNavigate();
   const dispatch = useDispatch();
 
-  console.log(props.feed);
+  // console.log(props.feed);
   const {
     firstName,
     lastName,
@@ -30,7 +30,7 @@ const UserCard = (props) => {
       const res = await axios.post(
         BASE_URL + "/request/send/" + status + "/" + userId,
         {},
-        { withCredentials: true }
+        { withCredentials: true },
       );
       console.log(res.data.data);
       dispatch(removeFeedUser(userId));

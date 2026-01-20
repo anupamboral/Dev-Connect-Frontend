@@ -21,7 +21,7 @@ const Requests = () => {
         {},
         { withCredentials: true },
       );
-      console.log(res.data);
+      // console.log(res.data);
       dispatch(removeRequest(connectionRequestId));
       //* showing toast only for 3 sec
       setConnectionRequestStatus(res.data.message);
@@ -47,7 +47,7 @@ const Requests = () => {
       const res = await axios.get(BASE_URL + "/user/requests/received", {
         withCredentials: true,
       });
-      console.log(res.data.data);
+      // console.log(res.data.data);
       dispatch(addRequests(res?.data?.data || []));
     } catch (err) {
       navigate("/error", {
@@ -171,11 +171,13 @@ const Requests = () => {
               </div>
             );
           })}
-        </div>{" "}
+        </div>
         {showToast && (
           <div className="toast toast-top toast-center">
-            <div className="alert alert-success">
-              <span className="text-black">{connectionRequestStatus}</span>
+            <div className="alert alert-success bg-emerald-400">
+              <span className="text-black font-semibold ">
+                {connectionRequestStatus}
+              </span>
             </div>
           </div>
         )}

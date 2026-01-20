@@ -33,7 +33,7 @@ const Chat = () => {
 
   //!1. function to load previous chats
   const fetchChatMessages = async (currentSkip, isInitial = true) => {
-    console.log(currentSkip);
+    // console.log(currentSkip);
     const chat = await axios.get(
       BASE_URL +
         "/chat/" +
@@ -44,9 +44,9 @@ const Chat = () => {
         LIMIT,
       {
         withCredentials: true,
-      }
+      },
     );
-    console.log(chat.data);
+    // console.log(chat.data);
 
     const chatMessages = chat?.data?.messages.map((msg) => {
       const { senderId, text, createdAt } = msg;
@@ -66,7 +66,7 @@ const Chat = () => {
       //////////////////*
       const { date: formattedDate, time: formattedTime } =
         formatChatTimestamp(istFormatTime);
-      console.log(formattedDate);
+      // console.log(formattedDate);
 
       return {
         firstName: senderId?.firstName,
@@ -117,7 +117,7 @@ const Chat = () => {
       const container = scrollRef.current; //* the div container containing all of the messages , as we require the scroll height from this container.
       // console.log(container);
       // console.log(
-        // "previousScrollHeightRef.current" + previousScrollHeightRef.current
+      // "previousScrollHeightRef.current" + previousScrollHeightRef.current
       // );
       //* Calculating how much the height increased and adjusting scroll position, so the user sees the same scroll position in the chat even after prepending old messages.
       container.scrollTop =
@@ -245,7 +245,7 @@ const Chat = () => {
           },
         ]);
         // console.log(messages);
-      }
+      },
     );
     //* if authentication error happens then to receive error on frontend when error happens and disconnecting the socket as in
     socket.on("connect_error", (err) => {

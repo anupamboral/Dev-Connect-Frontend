@@ -2738,7 +2738,7 @@ export const createSocketConnection = () => {
         { withCredentials: true },
       );
       dispatch(addUser(res.data));
-      //* showing toast only for 3 sec
+      ! showing toast only for 3 sec
       setShowToast(true);
       setTimeout(() => {
         setShowToast(false);
